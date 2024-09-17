@@ -34,7 +34,6 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 /*
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -50,9 +49,9 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name="MECENUM DrIvE ", group="Iterative OpMode")
+@TeleOp(name=" ROBot centRiC MECENUM DrIv TeLeOp ", group="Iterative OpMode")
 @Disabled
-public class WMECHANUMDRIVEONE extends OpMode
+public class ROBOTCENTRICTELEOP extends OpMode
 {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -101,13 +100,23 @@ public class WMECHANUMDRIVEONE extends OpMode
      */
     @Override
     public void loop() {
+        double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
+        double x = gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
+        double rx = gamepad1.right_stick_x;
 
-        double drive = -gamepad1.left_stick_y;
-        double turn  =  gamepad1.right_stick_x;
-        frontLeftMotor.setPower(Range.clip(drive + turn, -1.0, 1.0) );
-        frontRightMotor.setPower( Range.clip(drive - turn, -1.0, 1.0) );
-        backRightMotor.setPower( Range.clip( drive + turn, -1.0, 1.0) );
-        backLeftMotor.setPower( Range.clip( drive + turn, -1.0, 1.0) );
+        // Denominator is the largest motor power (absolute value) or 1
+        // This ensures all the powers maintain the same ratio,
+        // but only if at least one is out of the range [-1, 1]
+        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+        double frontLeftPower = (y + x + rx) / denominator;
+        double backLeftPower = (y - x + rx) / denominator;
+        double frontRightPower = (y - x - rx) / denominator;
+        double backRightPower = (y + x - rx) / denominator;
+
+        frontLeftMotor.setPower(frontLeftPower);
+        backLeftMotor.setPower(backLeftPower);
+        frontRightMotor.setPower(frontRightPower);
+        backRightMotor.setPower(backRightPower);
 
 
         // Send calculated power to wheels
