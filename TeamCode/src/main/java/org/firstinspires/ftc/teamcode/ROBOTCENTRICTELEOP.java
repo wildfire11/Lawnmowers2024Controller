@@ -55,10 +55,10 @@ public class ROBOTCENTRICTELEOP extends OpMode
 {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    DcMotor frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
-    DcMotor backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
-    DcMotor frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
-    DcMotor backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
+    DcMotor frontLeftMotor = hardwareMap.dcMotor.get("frontLeft");
+    DcMotor backLeftMotor = hardwareMap.dcMotor.get("leftRear");
+    DcMotor frontRightMotor = hardwareMap.dcMotor.get("frontRight");
+    DcMotor backRightMotor = hardwareMap.dcMotor.get("rightRear");
 
     /*
      * Code to run ONCE when the driver hits INIT
