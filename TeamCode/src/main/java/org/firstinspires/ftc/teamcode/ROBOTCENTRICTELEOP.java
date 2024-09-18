@@ -53,12 +53,15 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @Disabled
 public class ROBOTCENTRICTELEOP extends OpMode
 {
+    private DcMotor frontLeftMotor = null;
+    private DcMotor backLeftMotor = null;
+    private DcMotor frontRightMotor = null;
+    private DcMotor backRightMotor = null;
+
+
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    DcMotor frontLeftMotor = hardwareMap.dcMotor.get("frontLeft");
-    DcMotor backLeftMotor = hardwareMap.dcMotor.get("leftRear");
-    DcMotor frontRightMotor = hardwareMap.dcMotor.get("frontRight");
-    DcMotor backRightMotor = hardwareMap.dcMotor.get("rightRear");
+
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -70,7 +73,10 @@ public class ROBOTCENTRICTELEOP extends OpMode
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-
+        frontLeftMotor = hardwareMap.get(DcMotor.class, "frontLeft");
+        backLeftMotor = hardwareMap.get(DcMotor.class, "leftRear");
+        frontRightMotor = hardwareMap.get(DcMotor.class, "frontRight");
+        backRightMotor = hardwareMap.get(DcMotor.class, "rightRear");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.

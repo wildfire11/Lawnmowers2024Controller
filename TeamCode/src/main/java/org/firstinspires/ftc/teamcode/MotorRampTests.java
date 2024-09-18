@@ -44,8 +44,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * INCREMENT sets how much to increase/decrease the power each cycle
  * CYCLE_MS sets the update period.
  *
- * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
+ * Challenge: refactor this code to test all 4 motors, one at a time.
  */
 @TeleOp(name = "Ramp Motor Speed Tests", group = "Lawnmower Tests")
 public class MotorRampTests extends LinearOpMode {
@@ -60,10 +59,11 @@ public class MotorRampTests extends LinearOpMode {
     double  power   = 0;
     boolean rampUp  = true;
 
-    DcMotor frontLeftMotor = hardwareMap.dcMotor.get("frontLeft");
-    DcMotor backLeftMotor = hardwareMap.dcMotor.get("leftRear");
-    DcMotor frontRightMotor = hardwareMap.dcMotor.get("frontRight");
-    DcMotor backRightMotor = hardwareMap.dcMotor.get("rightRear");
+    private DcMotor frontLeftMotor = null;
+    private DcMotor backLeftMotor = null;
+    private DcMotor frontRightMotor = null;
+    private DcMotor backRightMotor = null;
+
 
 
     @Override
@@ -72,6 +72,14 @@ public class MotorRampTests extends LinearOpMode {
         // Connect to motor (Assume standard left wheel)
         // Change the text in quotes to match any motor name on your robot.
         motor = hardwareMap.get(DcMotor.class, "left_drive");
+
+        // Initialize the hardware variables. Note that the strings used here as parameters
+        // to 'get' must correspond to the names assigned during the robot configuration
+        // step (using the FTC Robot Controller app on the phone).
+        frontLeftMotor = hardwareMap.get(DcMotor.class, "frontLeft");
+        backLeftMotor = hardwareMap.get(DcMotor.class, "leftRear");
+        frontRightMotor = hardwareMap.get(DcMotor.class, "frontRight");
+        backRightMotor = hardwareMap.get(DcMotor.class, "rightRear");
 
         // Wait for the start button
         telemetry.addData(">", "Press Start to run Motors." );
