@@ -55,7 +55,7 @@ public class MotorRampTests extends LinearOpMode {
     static final double MAX_REV     = -1.0;     // Maximum REV power applied to motor
 
     // Define class members
-    DcMotor motor;
+
     double  power   = 0;
     boolean rampUp  = true;
 
@@ -71,7 +71,7 @@ public class MotorRampTests extends LinearOpMode {
 
         // Connect to motor (Assume standard left wheel)
         // Change the text in quotes to match any motor name on your robot.
-        motor = hardwareMap.get(DcMotor.class, "left_drive");
+
 
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
@@ -88,38 +88,132 @@ public class MotorRampTests extends LinearOpMode {
 
         // Ramp motor speeds till stop pressed.
         while(opModeIsActive()) {
+                while(gamepad1.x) {
+                    // Ramp the motors, according to the rampUp variable.
+                    if (rampUp) {
+                        // Keep stepping up until we hit the max value.
+                        power += INCREMENT;
+                        if (power >= MAX_FWD) {
+                            power = MAX_FWD;
+                            rampUp = !rampUp;   // Switch ramp direction
+                        }
+                    } else {
+                        // Keep stepping down until we hit the min value.
+                        power -= INCREMENT;
+                        if (power <= MAX_REV) {
+                            power = MAX_REV;
+                            rampUp = !rampUp;  // Switch ramp direction
 
-            // Ramp the motors, according to the rampUp variable.
-            if (rampUp) {
-                // Keep stepping up until we hit the max value.
-                power += INCREMENT ;
-                if (power >= MAX_FWD ) {
-                    power = MAX_FWD;
-                    rampUp = !rampUp;   // Switch ramp direction
+                        }
+                    }
+
+                    // Display the current value
+                    telemetry.addData("frontleft motor power", "%5.2f", power);
+                    telemetry.addData(">", "Press Stop to end test.");
+                    telemetry.update();
+
+                    // Set the motor to the new power and pause;
+                    frontLeftMotor.setPower(power);
+                    sleep(CYCLE_MS);
+                    idle();
                 }
-            }
-            else {
-                // Keep stepping down until we hit the min value.
-                power -= INCREMENT ;
-                if (power <= MAX_REV ) {
-                    power = MAX_REV;
-                    rampUp = !rampUp;  // Switch ramp direction
+                while(gamepad1.b) {
+                    if (rampUp) {
+                        // Keep stepping up until we hit the max value.
+                        power += INCREMENT;
+                        if (power >= MAX_FWD) {
+                            power = MAX_FWD;
+                            rampUp = !rampUp;   // Switch ramp direction
+                        }
+                    } else {
+                        // Keep stepping down until we hit the min value.
+                        power -= INCREMENT;
+                        if (power <= MAX_REV) {
+                            power = MAX_REV;
+                            rampUp = !rampUp;  // Switch ramp direction
+
+                        }
+                    }
+
+                    // Display the current value
+                    telemetry.addData("back right motor power", "%5.2f", power);
+                    telemetry.addData(">", "Press Stop to end test.");
+                    telemetry.update();
+
+                    // Set the motor to the new power and pause;
+                    backRightMotor.setPower(power);
+                    sleep(CYCLE_MS);
+                    idle();
                 }
+            while(gamepad1.y) {
+                if (rampUp) {
+                    // Keep stepping up until we hit the max value.
+                    power += INCREMENT;
+                    if (power >= MAX_FWD) {
+                        power = MAX_FWD;
+                        rampUp = !rampUp;   // Switch ramp direction
+                    }
+                } else {
+                    // Keep stepping down until we hit the min value.
+                    power -= INCREMENT;
+                    if (power <= MAX_REV) {
+                        power = MAX_REV;
+                        rampUp = !rampUp;  // Switch ramp direction
+
+                    }
+                }
+
+                // Display the current value
+                telemetry.addData("front right motor power", "%5.2f", power);
+                telemetry.addData(">", "Press Stop to end test.");
+                telemetry.update();
+
+                // Set the motor to the new power and pause;
+               frontRightMotor.setPower(power);
+                sleep(CYCLE_MS);
+                idle();
             }
+            while(gamepad1.a) {
+                if (rampUp) {
+                    // Keep stepping up until we hit the max value.
+                    power += INCREMENT;
+                    if (power >= MAX_FWD) {
+                        power = MAX_FWD;
+                        rampUp = !rampUp;   // Switch ramp direction
+                    }
+                } else {
+                    // Keep stepping down until we hit the min value.
+                    power -= INCREMENT;
+                    if (power <= MAX_REV) {
+                        power = MAX_REV;
+                        rampUp = !rampUp;  // Switch ramp direction
 
-            // Display the current value
-            telemetry.addData("Motor Power", "%5.2f", power);
-            telemetry.addData(">", "Press Stop to end test." );
-            telemetry.update();
+                    }
+                }
 
-            // Set the motor to the new power and pause;
-            motor.setPower(power);
-            sleep(CYCLE_MS);
-            idle();
+                // Display the current value
+                telemetry.addData("back left motor power", "%5.2f", power);
+                telemetry.addData(">", "Press Stop to end test.");
+                telemetry.update();
+
+                // Set the motor to the new power and pause;
+                backLeftMotor.setPower(power);
+                sleep(CYCLE_MS);
+                idle();
+            }
+            frontRightMotor.setPower(0);
+            frontLeftMotor.setPower(0);
+            backLeftMotor.setPower(0);
+            backRightMotor.setPower(0);
+
+
         }
 
         // Turn off motor and signal done;
-        motor.setPower(0);
+        frontRightMotor.setPower(0);
+        frontLeftMotor.setPower(0);
+        backLeftMotor.setPower(0);
+        backRightMotor.setPower(0);
         telemetry.addData(">", "Done");
         telemetry.update();
 
