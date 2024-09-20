@@ -215,7 +215,6 @@ public class MotorRampTests extends LinearOpMode {
         frontLeftMotor.setPower(0);
         backLeftMotor.setPower(0);
         backRightMotor.setPower(0);
-        telemetry.addData(">", "test complete");
         telemetry.addData(">", "Done");
         telemetry.update();
 
