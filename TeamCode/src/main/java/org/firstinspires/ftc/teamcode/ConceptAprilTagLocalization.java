@@ -27,14 +27,18 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.robotcontroller.external.samples;
+package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase.getIntoTheDeepTagLibrary;
+
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
@@ -44,6 +48,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -66,7 +71,6 @@ import java.util.List;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
  */
 @TeleOp(name = "Concept: AprilTag Localization", group = "Concept")
-@Disabled
 public class ConceptAprilTagLocalization extends LinearOpMode {
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
@@ -95,6 +99,18 @@ public class ConceptAprilTagLocalization extends LinearOpMode {
      * it's pointing straight left, -90 degrees for straight right, etc. You can also set the roll
      * to +/-90 degrees if it's vertical, or 180 degrees if it's upside-down.
      */
+    long tagDetectTime;
+    Pose2d localizerPose;
+    static class Params {
+        // distance FROM robot center TO camera (inches)
+        // TODO: tune
+        static Vector2d cameraOffset = new Vector2d(
+                0,
+                0);
+
+    }
+
+
     private Position cameraPosition = new Position(DistanceUnit.INCH,
             0, 0, 0, 0);
     private YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES,
@@ -109,7 +125,56 @@ public class ConceptAprilTagLocalization extends LinearOpMode {
      * The variable to store our instance of the vision portal.
      */
     private VisionPortal visionPortal;
+    public Vector2d getVectorBasedOnTags() {
+        ArrayList<AprilTagDetection> detections = aprilTag.getDetections();
+        if (detections.isEmpty()) {
+            return null;
+        } else {
+            tagDetectTime = aprilTag.getDetections().get(0).frameAcquisitionNanoTime;
+            return aprilTag.getDetections().stream() // get the tag detections as a Java stream
+                    // convert them to Vector2d positions using getFCPosition
+                    .map(detection -> getFCPosition(detection, localizerPose.getHeading(), Params.cameraOffset))
+                    // add them together
+                    .reduce(new Vector2d(0, 0), Vector2d::plus)
+                    // divide by the number of tags to get the average position
+                    .div(aprilTag.getDetections().size());
+        }
+    }
+    /**
+     * getFCPosition credit Michael from team 14343 (@overkil on Discord)
+     * @param botheading In Radians.
+     * @return FC Pose of bot.
+     */
+    public Vector2d getFCPosition(AprilTagDetection detection, double botheading, Vector2d cameraOffset) {
+        // get coordinates of the robot in RC coordinates
+        // ensure offsets are RC
+        double x = detection.ftcPose.x-cameraOffset.getX();
+        double y = detection.ftcPose.y-cameraOffset.getY();
 
+        // invert heading to correct properly
+        botheading = -botheading;
+
+        // rotate RC coordinates to be field-centric
+        double x2 = x*Math.cos(botheading)+y*Math.sin(botheading);
+        double y2 = x*-Math.sin(botheading)+y*Math.cos(botheading);
+        // add FC coordinates to apriltag position
+        // tags is just the CS apriltag library
+        VectorF tagpose = getIntoTheDeepTagLibrary().lookupTag(detection.id).fieldPosition;
+
+
+        // todo: this will need to be changed for next season (use tag heading to automate??)
+        if (!detection.metadata.name.contains("Audience")) { // is it a backdrop tag?
+            return new Vector2d(
+                    tagpose.get(0) + y2,
+                    tagpose.get(1) - x2);
+
+        } else {
+            return new Vector2d(
+                    tagpose.get(0) - y2,
+                    tagpose.get(1) + x2);
+
+        }
+    }
     @Override
     public void runOpMode() {
 
@@ -124,7 +189,6 @@ public class ConceptAprilTagLocalization extends LinearOpMode {
         while (opModeIsActive()) {
 
             telemetryAprilTag();
-
             // Push telemetry to the Driver Station.
             telemetry.update();
 
@@ -156,9 +220,9 @@ public class ConceptAprilTagLocalization extends LinearOpMode {
                 .setDrawAxes(true)
                 .setDrawCubeProjection(true)
                 .setDrawTagOutline(true)
-                //.setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
+                .setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
                 .setTagLibrary(AprilTagGameDatabase.getCurrentGameTagLibrary())
-               .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
+                .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
                 .setCameraPose(cameraPosition, cameraOrientation)
 
                 // == CAMERA CALIBRATION ==
@@ -224,12 +288,16 @@ public class ConceptAprilTagLocalization extends LinearOpMode {
         // Step through the list of detections and display info for each one.
         for (AprilTagDetection detection : currentDetections) {
             if (detection.metadata != null) {
+                tagDetectTime = aprilTag.getDetections().get(0).frameAcquisitionNanoTime;
+                //TODO: Find robot heading in radians with IMU.  0 is facing 
+                Vector2d calculatedPosition = getFCPosition(detection, 0, Params.cameraOffset);
+
+                telemetry.addLine(String.format("Detected x: %f, y: %f",calculatedPosition.getX(),calculatedPosition.getY()));
                 telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
                 telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)",
                         detection.robotPose.getPosition().x,
                         detection.robotPose.getPosition().y,
                         detection.robotPose.getPosition().z));
-
                 telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)",
                         detection.robotPose.getOrientation().getPitch(AngleUnit.DEGREES),
                         detection.robotPose.getOrientation().getRoll(AngleUnit.DEGREES),
