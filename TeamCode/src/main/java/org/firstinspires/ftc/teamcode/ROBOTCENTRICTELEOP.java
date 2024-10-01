@@ -51,7 +51,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @TeleOp(name=" ROBot centRiC MECENUM DrIv TeLeOp ", group="Iterative OpMode")
-@Disabled
 public class ROBOTCENTRICTELEOP extends OpMode
 {
     private DcMotor frontLeftMotor = null;
