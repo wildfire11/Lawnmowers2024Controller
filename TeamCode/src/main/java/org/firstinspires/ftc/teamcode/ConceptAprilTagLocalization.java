@@ -148,7 +148,12 @@ public class ConceptAprilTagLocalization extends LinearOpMode {
     public Vector2d getFCPosition(AprilTagDetection detection, double botheading, Vector2d cameraOffset) {
         // get coordinates of the robot in RC coordinates
         // ensure offsets are RC
-        double x = detection.ftcPose.x-cameraOffset.getX();
+
+        return new Vector2d(
+                detection.robotPose.getPosition().x,
+                detection.robotPose.getPosition().y
+        );
+        /*double x = detection.ftcPose.x-cameraOffset.getX();
         double y = detection.ftcPose.y-cameraOffset.getY();
 
         // invert heading to correct properly
@@ -157,10 +162,10 @@ public class ConceptAprilTagLocalization extends LinearOpMode {
         // rotate RC coordinates to be field-centric
         double x2 = x*Math.cos(botheading)+y*Math.sin(botheading);
         double y2 = x*-Math.sin(botheading)+y*Math.cos(botheading);
+
         // add FC coordinates to apriltag position
         // tags is just the CS apriltag library
         VectorF tagpose = getIntoTheDeepTagLibrary().lookupTag(detection.id).fieldPosition;
-
 
         // todo: this will need to be changed for next season (use tag heading to automate??)
         if (!detection.metadata.name.contains("Audience")) { // is it a backdrop tag?
@@ -173,7 +178,7 @@ public class ConceptAprilTagLocalization extends LinearOpMode {
                     tagpose.get(0) - y2,
                     tagpose.get(1) + x2);
 
-        }
+        }*/
     }
     @Override
     public void runOpMode() {
@@ -290,7 +295,7 @@ public class ConceptAprilTagLocalization extends LinearOpMode {
             if (detection.metadata != null) {
                 tagDetectTime = aprilTag.getDetections().get(0).frameAcquisitionNanoTime;
                 //TODO: Find robot heading in radians with IMU.  0 is facing 
-                Vector2d calculatedPosition = getFCPosition(detection, 0, Params.cameraOffset);
+                Vector2d calculatedPosition = getFCPosition(detection, Math.PI, Params.cameraOffset);
 
                 telemetry.addLine(String.format("Detected x: %f, y: %f",calculatedPosition.getX(),calculatedPosition.getY()));
                 telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
