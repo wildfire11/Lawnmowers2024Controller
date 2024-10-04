@@ -190,6 +190,15 @@ public class MotorRampTests extends LinearOpMode {
 
                     }
                 }
+                while (gamepad1.y)
+                {
+                    int startPosition;
+                    startPosition = backLeftMotor.getCurrentPosition();
+                    telemetry.addData("start position", startPosition);
+
+                    backLeftMotor.setPower(1);
+                    sleep(10000);
+                    backLeftMotor.setPower(0);}
 
                 // Display the current value
                 telemetry.addData("back left motor power", "%5.2f", power);

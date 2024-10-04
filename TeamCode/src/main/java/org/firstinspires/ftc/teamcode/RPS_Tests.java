@@ -70,10 +70,10 @@ public class RPS_Tests extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        frontLeftMotor = hardwareMap.get(DcMotor.class, "leftFront");
-        backLeftMotor = hardwareMap.get(DcMotor.class, "leftRear");
-        frontRightMotor = hardwareMap.get(DcMotor.class, "rightFront");
-        backRightMotor = hardwareMap.get(DcMotor.class, "rearRight");
+        frontLeftMotor = hardwareMap.get(DcMotor.class, "frontLeftMotor");
+        backLeftMotor = hardwareMap.get(DcMotor.class, "backLeftMotor");
+        frontRightMotor = hardwareMap.get(DcMotor.class, "frontRightMotor");
+        backRightMotor = hardwareMap.get(DcMotor.class, "backRightMotor");
 
         // Wait for the start button
         telemetry.addData(">", "Press Start to run Motors.");
