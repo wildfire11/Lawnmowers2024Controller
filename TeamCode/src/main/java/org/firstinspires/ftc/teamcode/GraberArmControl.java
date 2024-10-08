@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 /*
  * This OpMode ramps a single motor speed up and down repeatedly until Stop is pressed.
@@ -61,12 +62,17 @@ public class GraberArmControl extends LinearOpMode {
     boolean rampUp  = true;
 
 
+
+
     @Override
     public void runOpMode() {
 
         // Connect to motor (Assume standard left wheel)
         // Change the text in quotes to match any motor name on your robot.
         grabberArmElevator = hardwareMap.get(DcMotor.class, "grabberArmElevator");
+        grabberArmElevator.setDirection(DcMotorSimple.Direction.REVERSE);
+        grabberArmElevator.setTargetPosition(0);
+        grabberArmElevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //THIS IS VERY USEFUL :)
         // Wait for the start button
         telemetry.addData(">", "Press Start to run Motors." );
@@ -74,6 +80,12 @@ public class GraberArmControl extends LinearOpMode {
         waitForStart();
 //THIS IS VERY USEFUL :)
         // Ramp motor speeds till stop pressed.
+
+        int max_position = 700;
+        double min_position = 0.0;
+        double current_position = 0.0;
+
+
         while(opModeIsActive()) {
 //THIS IS VERY USEFUL :)
             // Ramp the motors, according to the rampUp variable.
@@ -93,33 +105,48 @@ public class GraberArmControl extends LinearOpMode {
 //                    power = MAX_REV;
 //                    rampUp = !rampUp;  // Switch ramp direction
 //                }
-//            }
+//            }2
+
+
+
 
 
 
             while (gamepad1.y) {
                 int startPosition;
-                startPosition = grabberArmElevator.getCurrentPosition();
-                telemetry.addData("start position", startPosition);
+                current_position = grabberArmElevator.getCurrentPosition();
+                telemetry.addData("Current Position:", current_position);
+                if (current_position < max_position){
+                    grabberArmElevator.setPower(.25);
+                    grabberArmElevator.setTargetPosition(max_position);
+                    //grabberArmElevator.setPower(0.25);
+                   // telemetry.addData("Power set to: ", 0.25);
+                    telemetry.addLine("Set to max possition");
+                    telemetry.update();}
+                else {
+                    telemetry.addLine("Max Height Reached");
+                   // grabberArmElevator.setPower(0);
+                }
 
-                grabberArmElevator.setPower(1);
 
             }
             while (gamepad1.a) {
                 int startPosition;
                 startPosition = grabberArmElevator.getCurrentPosition();
                 telemetry.addData("start position", startPosition);
+                if (current_position > min_position){
 
-                grabberArmElevator.setPower(-1);
+                    grabberArmElevator.setPower(-0.25);
+                    telemetry.addData("Power set to: ", 1);
+                    telemetry.update();}
+                else {
+                    telemetry.addLine("Min Height Reached");
+                    grabberArmElevator.setPower(0);
+                }
 
             }
             grabberArmElevator.setPower(0);
 
-
-            // Display the current value
-            telemetry.addData("Motor Power", "%5.2f", power);
-            telemetry.addData(">", "Press Stop to end test." );
-            telemetry.update();
 
             sleep(CYCLE_MS);
             idle();
