@@ -58,8 +58,7 @@ public class GraberArmControl extends LinearOpMode {
     //THIS IS VERY USEFUL :)
     // Define class members
     DcMotor grabberArmElevator;
-    double  power   = 0;
-    boolean rampUp  = true;
+
 
 
 
@@ -70,7 +69,7 @@ public class GraberArmControl extends LinearOpMode {
         // Connect to motor (Assume standard left wheel)
         // Change the text in quotes to match any motor name on your robot.
         grabberArmElevator = hardwareMap.get(DcMotor.class, "grabberArmElevator");
-        grabberArmElevator.setDirection(DcMotorSimple.Direction.REVERSE);
+        grabberArmElevator.setDirection(DcMotorSimple.Direction.FORWARD);
         grabberArmElevator.setTargetPosition(0);
         grabberArmElevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //THIS IS VERY USEFUL :)
@@ -82,7 +81,7 @@ public class GraberArmControl extends LinearOpMode {
         // Ramp motor speeds till stop pressed.
 
         int max_position = 700;
-        double min_position = 0.0;
+        int min_position = 0;
         double current_position = 0.0;
 
 
@@ -107,45 +106,44 @@ public class GraberArmControl extends LinearOpMode {
 //                }
 //            }2
 
-
-
-
-
-
+            current_position = grabberArmElevator.getCurrentPosition();
+            telemetry.addData("Current Position", current_position);
+            telemetry.update();
             while (gamepad1.y) {
                 int startPosition;
                 current_position = grabberArmElevator.getCurrentPosition();
                 telemetry.addData("Current Position:", current_position);
                 if (current_position < max_position){
-                    grabberArmElevator.setPower(.25);
+                    grabberArmElevator.setPower(0.25);
+                    telemetry.addData("Power set to: ", 0.25);
                     grabberArmElevator.setTargetPosition(max_position);
-                    //grabberArmElevator.setPower(0.25);
-                   // telemetry.addData("Power set to: ", 0.25);
-                    telemetry.addLine("Set to max possition");
+                    telemetry.addData("Target Position Set To:", 700 );
                     telemetry.update();}
                 else {
                     telemetry.addLine("Max Height Reached");
-                   // grabberArmElevator.setPower(0);
+//                    grabberArmElevator.setPower(0);
                 }
 
 
             }
             while (gamepad1.a) {
                 int startPosition;
-                startPosition = grabberArmElevator.getCurrentPosition();
-                telemetry.addData("start position", startPosition);
+                current_position = grabberArmElevator.getCurrentPosition();
+                telemetry.addData("Current Position:", current_position);
                 if (current_position > min_position){
-
                     grabberArmElevator.setPower(-0.25);
-                    telemetry.addData("Power set to: ", 1);
+                    telemetry.addData("Power set to: ", -0.25);
+                    grabberArmElevator.setTargetPosition(min_position);
+                    telemetry.addData("Target Position Set To:", 0);
                     telemetry.update();}
                 else {
                     telemetry.addLine("Min Height Reached");
-                    grabberArmElevator.setPower(0);
+//                    grabberArmElevator.setPower(0);
                 }
 
+
             }
-            grabberArmElevator.setPower(0);
+ //           grabberArmElevator.setPower(0);
 
 
             sleep(CYCLE_MS);
@@ -153,7 +151,7 @@ public class GraberArmControl extends LinearOpMode {
         }
 
         // Turn off motor and signal done;
-        grabberArmElevator.setPower(0);
+//        grabberArmElevator.setPower(0);
         telemetry.addData(">", "Done");
         telemetry.update();
 
