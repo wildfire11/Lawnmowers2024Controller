@@ -29,11 +29,10 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.Servo;
 
 /*
  * This OpMode ramps a single motor speed up and down repeatedly until Stop is pressed.
@@ -190,6 +189,15 @@ public class MotorRampTests extends LinearOpMode {
 
                     }
                 }
+                while (gamepad1.y)
+                {
+                    int startPosition;
+                    startPosition = backLeftMotor.getCurrentPosition();
+                    telemetry.addData("start position", startPosition);
+
+                    backLeftMotor.setPower(1);
+                    sleep(10000);
+                    backLeftMotor.setPower(0);}
 
                 // Display the current value
                 telemetry.addData("back left motor power", "%5.2f", power);
@@ -219,4 +227,6 @@ public class MotorRampTests extends LinearOpMode {
         telemetry.update();
 
     }
+
+
 }
