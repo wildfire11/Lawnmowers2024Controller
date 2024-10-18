@@ -35,6 +35,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import java.security.KeyStore;
+
 /*
  * This OpMode ramps a single motor speed up and down repeatedly until Stop is pressed.
  * The code is structured as a LinearOpMode
@@ -70,8 +72,8 @@ public class GraberArmControl extends LinearOpMode {
         // Change the text in quotes to match any motor name on your robot.
         grabberArmElevator = hardwareMap.get(DcMotor.class, "grabberArmElevator");
         grabberArmElevator.setDirection(DcMotorSimple.Direction.FORWARD);
-        grabberArmElevator.setTargetPosition(0);
-        grabberArmElevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //grabberArmElevator.setTargetPosition(0);
+        grabberArmElevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //THIS IS VERY USEFUL :)
         // Wait for the start button
         telemetry.addData(">", "Press Start to run Motors." );
@@ -80,9 +82,11 @@ public class GraberArmControl extends LinearOpMode {
 //THIS IS VERY USEFUL :)
         // Ramp motor speeds till stop pressed.
 
-        int max_position = 700;
+        int max_position = 2100;
         int min_position = 0;
         double current_position = 0.0;
+
+        boolean safety_net = true;
 
 
         while(opModeIsActive()) {
@@ -113,15 +117,15 @@ public class GraberArmControl extends LinearOpMode {
                 int startPosition;
                 current_position = grabberArmElevator.getCurrentPosition();
                 telemetry.addData("Current Position:", current_position);
-                if (current_position < max_position){
+                if (current_position < max_position || !safety_net){
                     grabberArmElevator.setPower(0.25);
                     telemetry.addData("Power set to: ", 0.25);
-                    grabberArmElevator.setTargetPosition(max_position);
-                    telemetry.addData("Target Position Set To:", 700 );
+                    //grabberArmElevator.setTargetPosition(max_position);
+                    //telemetry.addData("Target Position Set To:", 700 );
                     telemetry.update();}
                 else {
                     telemetry.addLine("Max Height Reached");
-//                    grabberArmElevator.setPower(0);
+                    grabberArmElevator.setPower(0);
                 }
 
 
@@ -130,20 +134,38 @@ public class GraberArmControl extends LinearOpMode {
                 int startPosition;
                 current_position = grabberArmElevator.getCurrentPosition();
                 telemetry.addData("Current Position:", current_position);
-                if (current_position > min_position){
+                if (current_position > min_position || !safety_net){
                     grabberArmElevator.setPower(-0.25);
                     telemetry.addData("Power set to: ", -0.25);
                     grabberArmElevator.setTargetPosition(min_position);
-                    telemetry.addData("Target Position Set To:", 0);
+                    //telemetry.addData("Target Position Set To:", 0);
                     telemetry.update();}
                 else {
                     telemetry.addLine("Min Height Reached");
-//                    grabberArmElevator.setPower(0);
+                    grabberArmElevator.setPower(0);
                 }
 
 
+                telemetry.update();}
+            if (gamepad1.x) {
+                if(safety_net){
+                    safety_net = false;
+                    telemetry.addData("Safety Net: ",  safety_net);
+                    telemetry.update();}
+                else{
+                    safety_net = true;
+                    telemetry.addData("Safety Net: ",  safety_net);
+                    telemetry.update();}
             }
- //           grabberArmElevator.setPower(0);
+
+
+            if (gamepad1.start) {
+                grabberArmElevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                grabberArmElevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                telemetry.addLine("ran");
+                telemetry.update();
+            }
+            grabberArmElevator.setPower(0);
 
 
             sleep(CYCLE_MS);
