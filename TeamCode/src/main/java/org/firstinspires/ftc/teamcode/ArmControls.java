@@ -29,13 +29,11 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-
-import java.security.KeyStore;
+import com.qualcomm.robotcore.hardware.Servo;
 
 /*
  * This OpMode ramps a single motor speed up and down repeatedly until Stop is pressed.
@@ -49,8 +47,8 @@ import java.security.KeyStore;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
-@TeleOp(name = "Graber Arm Teleop Controls", group = "MAIN")
-public class GraberArmControl extends LinearOpMode {
+@TeleOp(name = "Arm Controls", group = "MAIN")
+public class ArmControls extends LinearOpMode {
 
     static final double INCREMENT   = 0.01;     // amount to ramp motor each CYCLE_MS cycle
     static final int    CYCLE_MS    =   50;     // period of each cycle
@@ -60,16 +58,18 @@ public class GraberArmControl extends LinearOpMode {
     //THIS IS VERY USEFUL :)
     // Define class members
     DcMotor grabberArmElevator;
+    Servo servo1;
 
 
 
 
 
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException {
 
         // Connect to motor (Assume standard left wheel)
         // Change the text in quotes to match any motor name on your robot.
+        servo1=hardwareMap.get(Servo.class,"servo");
         grabberArmElevator = hardwareMap.get(DcMotor.class, "grabberArmElevator");
         grabberArmElevator.setDirection(DcMotorSimple.Direction.FORWARD);
         //grabberArmElevator.setTargetPosition(0);
@@ -113,7 +113,7 @@ public class GraberArmControl extends LinearOpMode {
             current_position = grabberArmElevator.getCurrentPosition();
             telemetry.addData("Current Position", current_position);
             telemetry.update();
-            while (gamepad1.y) {
+            while (gamepad2.y) {
                 int startPosition;
                 current_position = grabberArmElevator.getCurrentPosition();
                 telemetry.addData("Current Position:", current_position);
@@ -130,7 +130,7 @@ public class GraberArmControl extends LinearOpMode {
 
 
             }
-            while (gamepad1.a) {
+            while (gamepad2.a) {
                 int startPosition;
                 current_position = grabberArmElevator.getCurrentPosition();
                 telemetry.addData("Current Position:", current_position);
@@ -147,7 +147,7 @@ public class GraberArmControl extends LinearOpMode {
 
 
                 telemetry.update();}
-            if (gamepad1.x) {
+            if (gamepad2.x) {
                 if(safety_net){
                     safety_net = false;
                     telemetry.addData("Safety Net: ",  safety_net);
@@ -159,17 +159,31 @@ public class GraberArmControl extends LinearOpMode {
             }
 
 
-            if (gamepad1.start) {
+            if (gamepad2.start) {
                 grabberArmElevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 grabberArmElevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 telemetry.addLine("ran");
                 telemetry.update();
             }
+
+
+            if (gamepad2.b) {
+                telemetry.addLine("B is pressed");
+                telemetry.update();
+                servo1.setPosition(1);
+            }else{
+                servo1.setPosition(0);
+                telemetry.addLine("B is not pressed");
+            }
+
+
             grabberArmElevator.setPower(0);
 
 
             sleep(CYCLE_MS);
             idle();
+
+
         }
 
         // Turn off motor and signal done;
