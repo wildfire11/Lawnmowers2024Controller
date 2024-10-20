@@ -36,6 +36,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -62,6 +63,7 @@ public class FieldCentricTeleop extends OpMode
     private DcMotor frontRightMotor = null;
     private DcMotor backRightMotor = null;
     DcMotor armotor;
+    Servo servo1;
     DcMotor grabberArmElevator;
     static final int    CYCLE_MS    =   50;     // period of each cycle
     IMU imu = null;
@@ -83,6 +85,7 @@ public class FieldCentricTeleop extends OpMode
     public void init() {
         // Retrieve the IMU from the hardware map
         imu =  hardwareMap.get(IMU.class, "imu");
+        servo1=hardwareMap.get(Servo.class,"servo");
         // Adjust the orientation parameters to match your robot
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
@@ -285,6 +288,16 @@ public class FieldCentricTeleop extends OpMode
                 telemetry.update();}
         }
         grabberArmElevator.setPower(0);
+        if (gamepad2.right_stick_button) {
+            telemetry.addLine("opening claw");
+            telemetry.update();
+            servo1.setPosition(1);
+        }
+        if(gamepad2.left_stick_button) {
+            servo1.setPosition(0);
+            telemetry.addLine("closing claw");
+            telemetry.update();
+        }
 
         //         armotor.setPower(0);
 
