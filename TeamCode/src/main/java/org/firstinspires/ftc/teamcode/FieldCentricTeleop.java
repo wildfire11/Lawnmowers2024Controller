@@ -61,8 +61,12 @@ public class FieldCentricTeleop extends OpMode
     private DcMotor backLeftMotor = null;
     private DcMotor frontRightMotor = null;
     private DcMotor backRightMotor = null;
+    DcMotor armotor;
+    static final int    CYCLE_MS    =   50;     // period of each cycle
     IMU imu = null;
-
+    int max_position = 34250;
+    int min_position = 200;
+    double current_position = 0.0;
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -84,6 +88,18 @@ public class FieldCentricTeleop extends OpMode
         if (gamepad1.options) {
             imu.resetYaw();
         }
+        // Connect to motor (Assume standard left wheel)
+        // Change the text in quotes to match any motor name on your robot.
+        armotor = hardwareMap.get(DcMotor.class, "armotor");
+        armotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        armotor.setTargetPosition(0);
+        armotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+
+//THIS IS VERY USEFUL :)
+        // Wait for the start button
+        telemetry.addData(">", "Press Start to run Motors." );
+        telemetry.update();
 
 
 
@@ -160,6 +176,51 @@ public class FieldCentricTeleop extends OpMode
         backLeftMotor.setPower(backLeftPower);
         frontRightMotor.setPower(frontRightPower);
         backRightMotor.setPower(backRightPower);
+
+        current_position = armotor.getCurrentPosition();
+        telemetry.addData("Current Position", current_position);
+        telemetry.update();
+        while (gamepad2.y) {
+            armotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            current_position = armotor.getCurrentPosition();
+            telemetry.addData("Current Position:", current_position);
+            if (current_position < max_position){
+                armotor.setPower(0.75);
+                telemetry.addData("Power set to: ", 0.25);
+                armotor.setTargetPosition(max_position);
+                telemetry.addData("Target Position Set To:", 700 );
+                telemetry.update();}
+            else {
+                telemetry.addLine("Max Height Reached");
+//                    armotor.setPower(0);
+            }
+
+        }
+        while (gamepad2.x) {
+            armotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+
+
+        }
+        while (gamepad2.a) {
+            int startPosition;
+            armotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            current_position = armotor.getCurrentPosition();
+            telemetry.addData("Current Position:", current_position);
+            if (current_position > min_position){
+                armotor.setPower(-0.75);
+                telemetry.addData("Power set to: ", -0.25);
+                armotor.setTargetPosition(min_position);
+                telemetry.addData("Target Position Set To:", 0);
+                telemetry.update();}
+            else {
+                telemetry.addLine("Min Height Reached");
+//                    armotor.setPower(0);
+            }
+
+
+        }
+        //         armotor.setPower(0);
 
     }
 
