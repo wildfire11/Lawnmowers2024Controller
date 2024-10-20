@@ -62,11 +62,16 @@ public class FieldCentricTeleop extends OpMode
     private DcMotor frontRightMotor = null;
     private DcMotor backRightMotor = null;
     DcMotor armotor;
+    DcMotor grabberArmElevator;
     static final int    CYCLE_MS    =   50;     // period of each cycle
     IMU imu = null;
     int max_position = 34250;
     int min_position = 200;
     double current_position = 0.0;
+    int grabber_max_position = 700;
+    int grabber_min_position = 0;
+    double grabber_current_position = 0.0;
+    boolean safety_net = true;
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -96,6 +101,14 @@ public class FieldCentricTeleop extends OpMode
         armotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
 
+//THIS IS VERY USEFUL :)
+        // Wait for the start button
+        telemetry.addData(">", "Press Start to run Motors." );
+        telemetry.update();
+        grabberArmElevator = hardwareMap.get(DcMotor.class, "grabberArmElevator");
+        grabberArmElevator.setDirection(DcMotorSimple.Direction.FORWARD);
+        grabberArmElevator.setTargetPosition(0);
+        grabberArmElevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //THIS IS VERY USEFUL :)
         // Wait for the start button
         telemetry.addData(">", "Press Start to run Motors." );
@@ -196,8 +209,12 @@ public class FieldCentricTeleop extends OpMode
             }
 
         }
-        while (gamepad2.x) {
+        while (gamepad2.start) {
             armotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            grabberArmElevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            grabberArmElevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            telemetry.addLine("ran");
+            telemetry.update();
 
 
 
@@ -220,6 +237,55 @@ public class FieldCentricTeleop extends OpMode
 
 
         }
+        grabber_current_position = grabberArmElevator.getCurrentPosition();
+        telemetry.addData("Current Position", grabber_current_position);
+        telemetry.update();
+        while (gamepad2.x) {
+            int startPosition;
+            grabber_current_position = grabberArmElevator.getCurrentPosition();
+            telemetry.addData("Current Position:", grabber_current_position);
+            if (grabber_current_position < grabber_max_position || !safety_net){
+                grabberArmElevator.setPower(0.25);
+                telemetry.addData("Power set to: ", 0.25);
+                //grabberArmElevator.setTargetPosition(grabber_max_position);
+                //telemetry.addData("Target Position Set To:", 700 );
+                telemetry.update();}
+            else {
+                telemetry.addLine("Max Height Reached");
+                grabberArmElevator.setPower(0);
+            }
+
+
+        }
+        while (gamepad2.b) {
+            int startPosition;
+            grabber_current_position = grabberArmElevator.getCurrentPosition();
+            telemetry.addData("Current Position:", grabber_current_position);
+            if (grabber_current_position > grabber_min_position || !safety_net){
+                grabberArmElevator.setPower(-0.25);
+                telemetry.addData("Power set to: ", -0.25);
+                grabberArmElevator.setTargetPosition(grabber_min_position);
+                //telemetry.addData("Target Position Set To:", 0);
+                telemetry.update();}
+            else {
+                telemetry.addLine("Min Height Reached");
+                grabberArmElevator.setPower(0);
+            }
+
+
+            telemetry.update();}
+        if (gamepad2.left_bumper) {
+            if(safety_net){
+                safety_net = false;
+                telemetry.addData("Safety Net: ",  safety_net);
+                telemetry.update();}
+            else{
+                safety_net = true;
+                telemetry.addData("Safety Net: ",  safety_net);
+                telemetry.update();}
+        }
+        grabberArmElevator.setPower(0);
+
         //         armotor.setPower(0);
 
     }

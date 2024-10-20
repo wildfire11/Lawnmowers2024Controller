@@ -29,13 +29,10 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-
-import java.security.KeyStore;
 
 /*
  * This OpMode ramps a single motor speed up and down repeatedly until Stop is pressed.
@@ -82,9 +79,9 @@ public class GraberArmControl extends LinearOpMode {
 //THIS IS VERY USEFUL :)
         // Ramp motor speeds till stop pressed.
 
-        int max_position = 2100;
-        int min_position = 0;
-        double current_position = 0.0;
+        int grabber_max_position = 2100;
+        int grabber_min_position = 0;
+        double grabber_current_position = 0.0;
 
         boolean safety_net = true;
 
@@ -110,17 +107,17 @@ public class GraberArmControl extends LinearOpMode {
 //                }
 //            }2
 
-            current_position = grabberArmElevator.getCurrentPosition();
-            telemetry.addData("Current Position", current_position);
+            grabber_current_position = grabberArmElevator.getCurrentPosition();
+            telemetry.addData("Current Position", grabber_current_position);
             telemetry.update();
             while (gamepad1.y) {
                 int startPosition;
-                current_position = grabberArmElevator.getCurrentPosition();
-                telemetry.addData("Current Position:", current_position);
-                if (current_position < max_position || !safety_net){
+                grabber_current_position = grabberArmElevator.getCurrentPosition();
+                telemetry.addData("Current Position:", grabber_current_position);
+                if (grabber_current_position < grabber_max_position || !safety_net){
                     grabberArmElevator.setPower(0.25);
                     telemetry.addData("Power set to: ", 0.25);
-                    //grabberArmElevator.setTargetPosition(max_position);
+                    //grabberArmElevator.setTargetPosition(grabber_max_position);
                     //telemetry.addData("Target Position Set To:", 700 );
                     telemetry.update();}
                 else {
@@ -132,12 +129,12 @@ public class GraberArmControl extends LinearOpMode {
             }
             while (gamepad1.a) {
                 int startPosition;
-                current_position = grabberArmElevator.getCurrentPosition();
-                telemetry.addData("Current Position:", current_position);
-                if (current_position > min_position || !safety_net){
+                grabber_current_position = grabberArmElevator.getCurrentPosition();
+                telemetry.addData("Current Position:", grabber_current_position);
+                if (grabber_current_position > grabber_min_position || !safety_net){
                     grabberArmElevator.setPower(-0.25);
                     telemetry.addData("Power set to: ", -0.25);
-                    grabberArmElevator.setTargetPosition(min_position);
+                    grabberArmElevator.setTargetPosition(grabber_min_position);
                     //telemetry.addData("Target Position Set To:", 0);
                     telemetry.update();}
                 else {
