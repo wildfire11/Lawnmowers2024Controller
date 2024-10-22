@@ -14,15 +14,10 @@ public class MeepMeepTesting {
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .build();
 
-        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(0, 0, 0))
-                .lineToX(74)
-                .turn(Math.toRadians(82))
-                .lineToY(29)
-                .turn(Math.toRadians(73))
-                .lineToX(73)
-                .turn(Math.toRadians(74))
-                .lineToY(31)
-                .turn(Math.toRadians(23))
+        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(65, 0, 0))
+                .lineToX(56)
+                .turn(Math.toRadians(-90))
+                .lineToY(-67)
                 .build());
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_INTO_THE_DEEP_OFFICIAL)
