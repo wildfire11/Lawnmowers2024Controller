@@ -30,7 +30,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -55,37 +54,46 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name=" FieldCentricMainTeleop ", group="Iterative OpMode")
-public class FieldCentricTeleop extends OpMode
+@TeleOp(name=" Main Control ", group="MainControl")
+public class MainControl extends OpMode
 {
     private DcMotor frontLeftMotor = null;
     private DcMotor backLeftMotor = null;
     private DcMotor frontRightMotor = null;
     private DcMotor backRightMotor = null;
-    DcMotor armotor;
-    Servo servo1;
-    DcMotor grabberArmElevator;
-    static final int    CYCLE_MS    =   50;     // period of each cycle
     IMU imu = null;
-    int max_position = 34250;
-    int min_position = 200;
+    static final int    CYCLE_MS    =   50;
+
+    int max_position = 2100;
+    int min_position = 0;
     double current_position = 0.0;
-    int grabber_max_position = 700;
-    int grabber_min_position = 0;
-    double grabber_current_position = 0.0;
+
     boolean safety_net = true;
+
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
+    DcMotor grabberArmElevator;
+    Servo servo1;
 
 
     /*
      * Code to run ONCE when the driver hits INIT
      */
+
+    public void runOpMode() throws InterruptedException {
+
+        // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
+        // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
+        // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
+
+        // Tell the driver that initialization is complete.
+        telemetry.addData("Status", "Initialized");
+    }
+
     @Override
     public void init() {
         // Retrieve the IMU from the hardware map
         imu =  hardwareMap.get(IMU.class, "imu");
-        servo1=hardwareMap.get(Servo.class,"servo");
         // Adjust the orientation parameters to match your robot
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
@@ -96,26 +104,6 @@ public class FieldCentricTeleop extends OpMode
         if (gamepad1.options) {
             imu.resetYaw();
         }
-        // Connect to motor (Assume standard left wheel)
-        // Change the text in quotes to match any motor name on your robot.
-        armotor = hardwareMap.get(DcMotor.class, "armotor");
-        armotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        armotor.setTargetPosition(0);
-        armotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-
-//THIS IS VERY USEFUL :)
-        // Wait for the start button
-        telemetry.addData(">", "Press Start to run Motors." );
-        telemetry.update();
-        grabberArmElevator = hardwareMap.get(DcMotor.class, "grabberArmElevator");
-        grabberArmElevator.setDirection(DcMotorSimple.Direction.FORWARD);
-//        grabberArmElevator.setTargetPosition(0);
-        grabberArmElevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//THIS IS VERY USEFUL :)
-        // Wait for the start button
-        telemetry.addData(">", "Press Start to run Motors." );
-        telemetry.update();
 
 
 
@@ -131,12 +119,20 @@ public class FieldCentricTeleop extends OpMode
         backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
-        // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
-        // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
 
-        // Tell the driver that initialization is complete.
-        telemetry.addData("Status", "Initialized");
+        // Connect to motor (Assume standard left wheel)
+        // Change the text in quotes to match any motor name on your robot.
+        servo1=hardwareMap.get(Servo.class,"servo1");
+        grabberArmElevator = hardwareMap.get(DcMotor.class, "grabberArmElevator");
+        grabberArmElevator.setDirection(DcMotorSimple.Direction.FORWARD);
+        //grabberArmElevator.setTargetPosition(0);
+        grabberArmElevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//THIS IS VERY USEFUL :)
+        // Wait for the start button
+        telemetry.addData(">", "Press Start to run Motors." );
+        telemetry.update();
+//THIS IS VERY USEFUL :)
+        // Ramp motor speeds till stop pressed.
     }
 
     /*
@@ -193,68 +189,19 @@ public class FieldCentricTeleop extends OpMode
         frontRightMotor.setPower(frontRightPower);
         backRightMotor.setPower(backRightPower);
 
-        current_position = armotor.getCurrentPosition();
-        telemetry.addData("Current Position", current_position);;
-        if (gamepad2.y) {
-            armotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            current_position = armotor.getCurrentPosition();
+        current_position = grabberArmElevator.getCurrentPosition();
+        telemetry.addData("Current Position", current_position);
+        telemetry.update();
+        while (gamepad2.y) {
+            int startPosition;
+            current_position = grabberArmElevator.getCurrentPosition();
             telemetry.addData("Current Position:", current_position);
-            if (current_position < max_position){
-                armotor.setPower(0.75);
+            if (current_position < max_position || !safety_net){
+                grabberArmElevator.setPower(0.25);
                 telemetry.addData("Power set to: ", 0.25);
-                armotor.setTargetPosition(max_position);
-                telemetry.addData("Target Position Set To:", 700 );
-                }
-            else {
-                telemetry.addLine("Max Height Reached");
-//                    armotor.setPower(0);
-            }
-
-        }
-        if (gamepad2.start) {
-            armotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            grabberArmElevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            grabberArmElevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            telemetry.addLine("ran");
-
-
-
-
-        }
-        else {
-            telemetry.addLine("hello");
-        };
-        if (gamepad2.a) {
-            int startPosition;
-            armotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            current_position = armotor.getCurrentPosition();
-            telemetry.addData("Current Position:", current_position);
-            if (current_position > min_position){
-                armotor.setPower(-0.75);
-                telemetry.addData("Power set to: ", -0.25);
-                armotor.setTargetPosition(min_position);
-                telemetry.addData("Target Position Set To:", 0);
-                }
-            else {
-                telemetry.addLine("Min Height Reached");
-//                    armotor.setPower(0);
-            }
-
-
-        }
-        grabber_current_position = grabberArmElevator.getCurrentPosition();
-        telemetry.addData("Grabber current Position", grabber_current_position);
-        if (gamepad2.x) {
-            int startPosition;
-            grabber_current_position = grabberArmElevator.getCurrentPosition();
-            telemetry.addData("Current Position:", grabber_current_position);
-            if (grabber_current_position < grabber_max_position){
-                grabberArmElevator.setPower(1);
-                telemetry.addData("Grabber current position:", grabber_current_position);
-                telemetry.addData("Power set to: ", 1);
-                //grabberArmElevator.setTargetPosition(grabber_max_position);
+                //grabberArmElevator.setTargetPosition(max_position);
                 //telemetry.addData("Target Position Set To:", 700 );
-                 }
+                telemetry.update();}
             else {
                 telemetry.addLine("Max Height Reached");
                 grabberArmElevator.setPower(0);
@@ -262,55 +209,68 @@ public class FieldCentricTeleop extends OpMode
 
 
         }
-        else{
-            telemetry.addLine("hello");
-        }
-        if (gamepad2.b) {
+        while (gamepad2.a) {
             int startPosition;
-            grabber_current_position = grabberArmElevator.getCurrentPosition();
-            telemetry.addData("Current Position:", grabber_current_position);
-            if (grabber_current_position > grabber_min_position) {
-                grabberArmElevator.setPower(-1);
-                telemetry.addData("Power set to: ", -1);
-                telemetry.addData("Grabber current position:", grabber_current_position);
-                grabberArmElevator.setTargetPosition(grabber_min_position);
+            current_position = grabberArmElevator.getCurrentPosition();
+            telemetry.addData("Current Position:", current_position);
+            if (current_position > min_position || !safety_net){
+                grabberArmElevator.setPower(-0.25);
+                telemetry.addData("Power set to: ", -0.25);
+                grabberArmElevator.setTargetPosition(min_position);
                 //telemetry.addData("Target Position Set To:", 0);
-            } else {
+                telemetry.update();}
+            else {
                 telemetry.addLine("Min Height Reached");
                 grabberArmElevator.setPower(0);
             }
 
 
-
-
-            }
-        else{
-            telemetry.addLine("hello");
-        }
-        grabberArmElevator.setPower(0);
-        if (gamepad2.right_stick_button) {
-            telemetry.addLine("opening claw");
-            servo1.setPosition(1);
-        }
-        if(gamepad2.left_stick_button) {
-            servo1.setPosition(0);
-            telemetry.addLine("closing claw");
-
-        }
-        if (gamepad2.left_bumper) {
+            telemetry.update();}
+        if (gamepad2.x) {
             if(safety_net){
                 safety_net = false;
                 telemetry.addData("Safety Net: ",  safety_net);
-                }
+                telemetry.update();}
             else{
                 safety_net = true;
-                telemetry.addData("Safety Net: ",  safety_net);}
+                telemetry.addData("Safety Net: ",  safety_net);
+                telemetry.update();}
         }
 
-        //         armotor.setPower(0);
+
+        if (gamepad2.start) {
+            grabberArmElevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            grabberArmElevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            telemetry.addLine("ran");
+            telemetry.update();
+        }
 
 
-        telemetry.update();}
+        if (gamepad2.b) {
+            telemetry.addLine("B is pressed");
+            telemetry.update();
+            servo1.setPosition(1);
+        }else{
+            servo1.setPosition(0);
+            telemetry.addLine("B is not pressed");
+        }
+
+
+        grabberArmElevator.setPower(0);
+
+
+        //sleep(CYCLE_MS);
+        //idle();
+
+
+
+
+    // Turn off motor and signal done;
+//        grabberArmElevator.setPower(0);
+        telemetry.addData(">", "Done");
+        telemetry.update();
+
+    }
 
     /*
      * Code to run ONCE after the driver hits STOP

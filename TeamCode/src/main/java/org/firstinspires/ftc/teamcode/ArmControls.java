@@ -69,7 +69,7 @@ public class ArmControls extends LinearOpMode {
 
         // Connect to motor (Assume standard left wheel)
         // Change the text in quotes to match any motor name on your robot.
-        servo1=hardwareMap.get(Servo.class,"servo");
+        servo1=hardwareMap.get(Servo.class,"servo1");
         grabberArmElevator = hardwareMap.get(DcMotor.class, "grabberArmElevator");
         grabberArmElevator.setDirection(DcMotorSimple.Direction.FORWARD);
         //grabberArmElevator.setTargetPosition(0);
@@ -82,7 +82,7 @@ public class ArmControls extends LinearOpMode {
 //THIS IS VERY USEFUL :)
         // Ramp motor speeds till stop pressed.
 
-        int max_position = 2100;
+        int max_position = 3570;
         int min_position = 0;
         double current_position = 0.0;
 
@@ -118,8 +118,8 @@ public class ArmControls extends LinearOpMode {
                 current_position = grabberArmElevator.getCurrentPosition();
                 telemetry.addData("Current Position:", current_position);
                 if (current_position < max_position || !safety_net){
-                    grabberArmElevator.setPower(0.25);
-                    telemetry.addData("Power set to: ", 0.25);
+                    grabberArmElevator.setPower(0.75);
+                    telemetry.addData("Power set to: ", 0.75);
                     //grabberArmElevator.setTargetPosition(max_position);
                     //telemetry.addData("Target Position Set To:", 700 );
                     telemetry.update();}
@@ -135,8 +135,8 @@ public class ArmControls extends LinearOpMode {
                 current_position = grabberArmElevator.getCurrentPosition();
                 telemetry.addData("Current Position:", current_position);
                 if (current_position > min_position || !safety_net){
-                    grabberArmElevator.setPower(-0.25);
-                    telemetry.addData("Power set to: ", -0.25);
+                    grabberArmElevator.setPower(-0.75);
+                    telemetry.addData("Power set to: ", -0.75);
                     grabberArmElevator.setTargetPosition(min_position);
                     //telemetry.addData("Target Position Set To:", 0);
                     telemetry.update();}
@@ -167,13 +167,13 @@ public class ArmControls extends LinearOpMode {
             }
 
 
-            if (gamepad2.b) {
-                telemetry.addLine("B is pressed");
+            if (gamepad2.right_bumper) {
+                telemetry.addLine("Claw is open");
                 telemetry.update();
-                servo1.setPosition(1);
-            }else{
+                servo1.setPosition(0.5);
+            }else if(gamepad2.left_bumper){
                 servo1.setPosition(0);
-                telemetry.addLine("B is not pressed");
+                telemetry.addLine("Claw is closed");
             }
 
 
