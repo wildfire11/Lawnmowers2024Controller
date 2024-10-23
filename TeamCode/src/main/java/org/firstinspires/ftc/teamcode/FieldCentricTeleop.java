@@ -99,7 +99,7 @@ public class FieldCentricTeleop extends OpMode
         // Connect to motor (Assume standard left wheel)
         // Change the text in quotes to match any motor name on your robot.
         armotor = hardwareMap.get(DcMotor.class, "armotor");
-        armotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        armotor.setDirection(DcMotorSimple.Direction.REVERSE);
         armotor.setTargetPosition(0);
         armotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
