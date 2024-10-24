@@ -248,6 +248,7 @@ public class FieldCentricTeleop extends OpMode
             int startPosition;
             grabber_current_position = grabberArmElevator.getCurrentPosition();
             telemetry.addData("Current Position:", grabber_current_position);
+
             if (grabber_current_position < grabber_max_position){
                 grabberArmElevator.setPower(1);
                 telemetry.addData("Grabber current position:", grabber_current_position);
@@ -283,14 +284,14 @@ public class FieldCentricTeleop extends OpMode
 
 
 
-            }
+        }
         else{
             telemetry.addLine("hello");
         }
-        grabberArmElevator.setPower(0);
+        //grabberArmElevator.setPower(0);
         if (gamepad2.right_stick_button) {
             telemetry.addLine("opening claw");
-            servo1.setPosition(1);
+            servo1.setPosition(0.4);
         }
         if(gamepad2.left_stick_button) {
             servo1.setPosition(0);
