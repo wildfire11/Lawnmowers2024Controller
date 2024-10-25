@@ -70,7 +70,7 @@ public class FieldCentricTeleop extends OpMode
     int max_position = 34250;
     int min_position = 200;
     double current_position = 0.0;
-    int grabber_max_position = 700;
+    int grabber_max_position = 3000;
     int grabber_min_position = 0;
     double grabber_current_position = 0.0;
     boolean safety_net = true;
