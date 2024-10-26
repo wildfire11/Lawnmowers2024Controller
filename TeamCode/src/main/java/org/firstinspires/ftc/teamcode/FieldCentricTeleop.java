@@ -67,7 +67,7 @@ public class FieldCentricTeleop extends OpMode
     DcMotor grabberArmElevator;
     static final int    CYCLE_MS    =   50;     // period of each cycle
     IMU imu = null;
-    int max_position = 34250;
+    int max_position = 36320;
     int min_position = 200;
     double current_position = 0.0;
     int grabber_max_position = 3000;
@@ -93,6 +93,7 @@ public class FieldCentricTeleop extends OpMode
 // Without this, the REV Hub's orientation is assumed to be logo up / USB forward
         imu.initialize(parameters);
         telemetry.addData("Status", "Initialized");
+
         if (gamepad1.options) {
             imu.resetYaw();
         }
@@ -152,6 +153,11 @@ public class FieldCentricTeleop extends OpMode
     @Override
     public void start() {
         runtime.reset();
+        imu.resetYaw();
+        armotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        grabberArmElevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        grabberArmElevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        telemetry.addLine("ran");
     }
 
     /*
@@ -162,7 +168,7 @@ public class FieldCentricTeleop extends OpMode
     public void loop() {
         double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
         double x = gamepad1.left_stick_x;
-        double rx = gamepad1.right_stick_x;
+        double rx = -gamepad1.right_stick_x;
 
         // This button choice was made so that it is hard to hit on accident,
         // it can be freely changed based on preference.
@@ -195,12 +201,12 @@ public class FieldCentricTeleop extends OpMode
 
         current_position = armotor.getCurrentPosition();
         telemetry.addData("Current Position", current_position);;
-        if (gamepad2.y) {
+        if (gamepad2.x) {
             armotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             current_position = armotor.getCurrentPosition();
             telemetry.addData("Current Position:", current_position);
             if (current_position < max_position){
-                armotor.setPower(0.75);
+                armotor.setPower(1.0);
                 telemetry.addData("Power set to: ", 0.25);
                 armotor.setTargetPosition(max_position);
                 telemetry.addData("Target Position Set To:", 700 );
@@ -211,26 +217,14 @@ public class FieldCentricTeleop extends OpMode
             }
 
         }
-        if (gamepad2.start) {
-            armotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            grabberArmElevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            grabberArmElevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            telemetry.addLine("ran");
 
-
-
-
-        }
-        else {
-            telemetry.addLine("hello");
-        };
-        if (gamepad2.a) {
+        if (gamepad2.b) {
             int startPosition;
             armotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             current_position = armotor.getCurrentPosition();
             telemetry.addData("Current Position:", current_position);
             if (current_position > min_position){
-                armotor.setPower(-0.75);
+                armotor.setPower(-1.0);
                 telemetry.addData("Power set to: ", -0.25);
                 armotor.setTargetPosition(min_position);
                 telemetry.addData("Target Position Set To:", 0);
@@ -244,7 +238,7 @@ public class FieldCentricTeleop extends OpMode
         }
         grabber_current_position = grabberArmElevator.getCurrentPosition();
         telemetry.addData("Grabber current Position", grabber_current_position);
-        if (gamepad2.x) {
+        if (gamepad2.y) {
             int startPosition;
             grabber_current_position = grabberArmElevator.getCurrentPosition();
             telemetry.addData("Current Position:", grabber_current_position);
@@ -264,9 +258,10 @@ public class FieldCentricTeleop extends OpMode
 
         }
         else{
-            telemetry.addLine("hello");
+            telemetry.addLine("none");
+
         }
-        if (gamepad2.b) {
+        if (gamepad2.a) {
             int startPosition;
             grabber_current_position = grabberArmElevator.getCurrentPosition();
             telemetry.addData("Current Position:", grabber_current_position);
@@ -274,7 +269,7 @@ public class FieldCentricTeleop extends OpMode
                 grabberArmElevator.setPower(-1);
                 telemetry.addData("Power set to: ", -1);
                 telemetry.addData("Grabber current position:", grabber_current_position);
-                grabberArmElevator.setTargetPosition(grabber_min_position);
+                //grabberArmElevator.setTargetPosition(grabber_min_position);
                 //telemetry.addData("Target Position Set To:", 0);
             } else {
                 telemetry.addLine("Min Height Reached");
@@ -286,7 +281,12 @@ public class FieldCentricTeleop extends OpMode
 
         }
         else{
-            telemetry.addLine("hello");
+            telemetry.addLine("N/A");
+
+        }
+        if (!gamepad2.y && !gamepad2.a){
+            grabberArmElevator.setPower(0);
+            telemetry.addLine("no buttons power = 0");
         }
         //grabberArmElevator.setPower(0);
         if (gamepad2.right_stick_button) {
