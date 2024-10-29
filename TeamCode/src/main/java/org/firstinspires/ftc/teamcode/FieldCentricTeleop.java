@@ -291,7 +291,7 @@ public class FieldCentricTeleop extends OpMode
         //grabberArmElevator.setPower(0);
         if (gamepad2.right_stick_button) {
             telemetry.addLine("opening claw");
-            servo1.setPosition(0.4);
+            servo1.setPosition(0.35);
         }
         if(gamepad2.left_stick_button) {
             servo1.setPosition(0);
