@@ -58,24 +58,24 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 @TeleOp(name=" FieldCentricMainTeleop ", group="Iterative OpMode")
 public class FieldCentricTeleop extends OpMode
 {
-    private DcMotor frontLeftMotor = null;
-    private DcMotor backLeftMotor = null;
-    private DcMotor frontRightMotor = null;
-    private DcMotor backRightMotor = null;
-    DcMotor armotor;
+//    private DcMotor frontLeftMotor = null;
+//    private DcMotor backLeftMotor = null;
+//    private DcMotor frontRightMotor = null;
+//    private DcMotor backRightMotor = null;
+//    DcMotor armotor;
     Servo servo1;
-    DcMotor grabberArmElevator;
-    static final int    CYCLE_MS    =   50;     // period of each cycle
-    IMU imu = null;
-    int max_position = 36320;
-    int min_position = 200;
-    double current_position = 0.0;
-    int grabber_max_position = 3000;
-    int grabber_min_position = 0;
-    double grabber_current_position = 0.0;
-    boolean safety_net = true;
-    // Declare OpMode members.
-    private ElapsedTime runtime = new ElapsedTime();
+//    DcMotor grabberArmElevator;
+//    static final int    CYCLE_MS    =   50;     // period of each cycle
+//    IMU imu = null;
+//    int max_position = 36320;
+//    int min_position = 200;
+//    double current_position = 0.0;
+//    int grabber_max_position = 3000;
+//    int grabber_min_position = 0;
+//    double grabber_current_position = 0.0;
+//    boolean safety_net = true;
+//    // Declare OpMode members.
+//    private ElapsedTime runtime = new ElapsedTime();
 
 
     /*
@@ -84,39 +84,39 @@ public class FieldCentricTeleop extends OpMode
     @Override
     public void init() {
         // Retrieve the IMU from the hardware map
-        imu =  hardwareMap.get(IMU.class, "imu");
+//        imu =  hardwareMap.get(IMU.class, "imu");
         servo1=hardwareMap.get(Servo.class,"servo");
-        // Adjust the orientation parameters to match your robot
-        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
-                RevHubOrientationOnRobot.UsbFacingDirection.UP));
-// Without this, the REV Hub's orientation is assumed to be logo up / USB forward
-        imu.initialize(parameters);
-        telemetry.addData("Status", "Initialized");
-
-        if (gamepad1.options) {
-            imu.resetYaw();
-        }
+//        // Adjust the orientation parameters to match your robot
+//        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+//                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+//                RevHubOrientationOnRobot.UsbFacingDirection.UP));
+//// Without this, the REV Hub's orientation is assumed to be logo up / USB forward
+//        imu.initialize(parameters);
+//        telemetry.addData("Status", "Initialized");
+//
+//        if (gamepad1.options) {
+//            imu.resetYaw();
+//        }
         // Connect to motor (Assume standard left wheel)
         // Change the text in quotes to match any motor name on your robot.
-        armotor = hardwareMap.get(DcMotor.class, "armotor");
-        armotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        armotor.setTargetPosition(0);
-        armotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        armotor = hardwareMap.get(DcMotor.class, "armotor");
+//        armotor.setDirection(DcMotorSimple.Direction.REVERSE);
+//        armotor.setTargetPosition(0);
+//        armotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
 
 //THIS IS VERY USEFUL :)
         // Wait for the start button
-        telemetry.addData(">", "Press Start to run Motors." );
-        telemetry.update();
-        grabberArmElevator = hardwareMap.get(DcMotor.class, "grabberArmElevator");
-        grabberArmElevator.setDirection(DcMotorSimple.Direction.FORWARD);
-//        grabberArmElevator.setTargetPosition(0);
-        grabberArmElevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//THIS IS VERY USEFUL :)
-        // Wait for the start button
-        telemetry.addData(">", "Press Start to run Motors." );
-        telemetry.update();
+//        telemetry.addData(">", "Press Start to run Motors." );
+//        telemetry.update();
+//        grabberArmElevator = hardwareMap.get(DcMotor.class, "grabberArmElevator");
+//        grabberArmElevator.setDirection(DcMotorSimple.Direction.FORWARD);
+////        grabberArmElevator.setTargetPosition(0);
+//        grabberArmElevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+////THIS IS VERY USEFUL :)
+//        // Wait for the start button
+//        telemetry.addData(">", "Press Start to run Motors." );
+//        telemetry.update();
 
 
 
@@ -124,14 +124,14 @@ public class FieldCentricTeleop extends OpMode
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        frontLeftMotor = hardwareMap.get(DcMotor.class, "frontLeftMotor");
-        backLeftMotor = hardwareMap.get(DcMotor.class, "backLeftMotor");
-        frontRightMotor = hardwareMap.get(DcMotor.class, "frontRightMotor");
-        backRightMotor = hardwareMap.get(DcMotor.class, "backRightMotor");
-        frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+//        frontLeftMotor = hardwareMap.get(DcMotor.class, "frontLeftMotor");
+//        backLeftMotor = hardwareMap.get(DcMotor.class, "backLeftMotor");
+//        frontRightMotor = hardwareMap.get(DcMotor.class, "frontRightMotor");
+//        backRightMotor = hardwareMap.get(DcMotor.class, "backRightMotor");
+//        frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+//        backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+//        backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+//        frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
@@ -152,12 +152,12 @@ public class FieldCentricTeleop extends OpMode
      */
     @Override
     public void start() {
-        runtime.reset();
-        imu.resetYaw();
-        armotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        grabberArmElevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        grabberArmElevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        telemetry.addLine("ran");
+//        runtime.reset();
+//        imu.resetYaw();
+//        armotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        grabberArmElevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        grabberArmElevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        telemetry.addLine("ran");
     }
 
     /*
@@ -166,152 +166,153 @@ public class FieldCentricTeleop extends OpMode
 
     @Override
     public void loop() {
-        double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
-        double x = gamepad1.left_stick_x;
-        double rx = -gamepad1.right_stick_x;
-
-        // This button choice was made so that it is hard to hit on accident,
-        // it can be freely changed based on preference.
-        // The equivalent button is start on Xbox-style controllers.
-        if (gamepad1.options) {
-            imu.resetYaw();
-        }
-
-        double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-
-        // Rotate the movement direction counter to the bot's rotation
-        double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
-        double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
-
-        rotX = rotX * 1;  // Counteract imperfect strafing
-
-        // Denominator is the largest motor power (absolute value) or 1
-        // This ensures all the powers maintain the same ratio,
-        // but only if at least one is out of the range [-1, 1]
-        double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
-        double frontLeftPower = (rotY + rotX + rx) / denominator;
-        double backLeftPower = (rotY - rotX + rx) / denominator;
-        double frontRightPower = (rotY - rotX - rx) / denominator;
-        double backRightPower = (rotY + rotX - rx) / denominator;
-
-        frontLeftMotor.setPower(frontLeftPower);
-        backLeftMotor.setPower(backLeftPower);
-        frontRightMotor.setPower(frontRightPower);
-        backRightMotor.setPower(backRightPower);
-
-        current_position = armotor.getCurrentPosition();
-        telemetry.addData("Current Position", current_position);;
-        if (gamepad2.x) {
-            armotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            current_position = armotor.getCurrentPosition();
-            telemetry.addData("Current Position:", current_position);
-            if (current_position < max_position){
-                armotor.setPower(1.0);
-                telemetry.addData("Power set to: ", 0.25);
-                armotor.setTargetPosition(max_position);
-                telemetry.addData("Target Position Set To:", 700 );
-                }
-            else {
-                telemetry.addLine("Max Height Reached");
-//                    armotor.setPower(0);
-            }
-
-        }
-
-        if (gamepad2.b) {
-            int startPosition;
-            armotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            current_position = armotor.getCurrentPosition();
-            telemetry.addData("Current Position:", current_position);
-            if (current_position > min_position){
-                armotor.setPower(-1.0);
-                telemetry.addData("Power set to: ", -0.25);
-                armotor.setTargetPosition(min_position);
-                telemetry.addData("Target Position Set To:", 0);
-                }
-            else {
-                telemetry.addLine("Min Height Reached");
-//                    armotor.setPower(0);
-            }
-
-
-        }
-        grabber_current_position = grabberArmElevator.getCurrentPosition();
-        telemetry.addData("Grabber current Position", grabber_current_position);
-        if (gamepad2.y) {
-            int startPosition;
-            grabber_current_position = grabberArmElevator.getCurrentPosition();
-            telemetry.addData("Current Position:", grabber_current_position);
-
-            if (grabber_current_position < grabber_max_position){
-                grabberArmElevator.setPower(1);
-                telemetry.addData("Grabber current position:", grabber_current_position);
-                telemetry.addData("Power set to: ", 1);
-                //grabberArmElevator.setTargetPosition(grabber_max_position);
-                //telemetry.addData("Target Position Set To:", 700 );
-                 }
-            else {
-                telemetry.addLine("Max Height Reached");
-                grabberArmElevator.setPower(0);
-            }
-
-
-        }
-        else{
-            telemetry.addLine("none");
-
-        }
-        if (gamepad2.a) {
-            int startPosition;
-            grabber_current_position = grabberArmElevator.getCurrentPosition();
-            telemetry.addData("Current Position:", grabber_current_position);
-            if (grabber_current_position > grabber_min_position) {
-                grabberArmElevator.setPower(-1);
-                telemetry.addData("Power set to: ", -1);
-                telemetry.addData("Grabber current position:", grabber_current_position);
-                //grabberArmElevator.setTargetPosition(grabber_min_position);
-                //telemetry.addData("Target Position Set To:", 0);
-            } else {
-                telemetry.addLine("Min Height Reached");
-                grabberArmElevator.setPower(0);
-            }
-
-
-
-
-        }
-        else{
-            telemetry.addLine("N/A");
-
-        }
-        if (!gamepad2.y && !gamepad2.a){
-            grabberArmElevator.setPower(0);
-            telemetry.addLine("no buttons power = 0");
-        }
+//        double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
+//        double x = gamepad1.left_stick_x;
+//        double rx = -gamepad1.right_stick_x;
+//
+//        // This button choice was made so that it is hard to hit on accident,
+//        // it can be freely changed based on preference.
+//        // The equivalent button is start on Xbox-style controllers.
+//        if (gamepad1.options) {
+//            imu.resetYaw();
+//        }
+//
+//        double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+//
+//        // Rotate the movement direction counter to the bot's rotation
+//        double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
+//        double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
+//
+//        rotX = rotX * 1;  // Counteract imperfect strafing
+//
+//        // Denominator is the largest motor power (absolute value) or 1
+//        // This ensures all the powers maintain the same ratio,
+//        // but only if at least one is out of the range [-1, 1]
+//        double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
+//        double frontLeftPower = (rotY + rotX + rx) / denominator;
+//        double backLeftPower = (rotY - rotX + rx) / denominator;
+//        double frontRightPower = (rotY - rotX - rx) / denominator;
+//        double backRightPower = (rotY + rotX - rx) / denominator;
+//
+//        frontLeftMotor.setPower(frontLeftPower);
+//        backLeftMotor.setPower(backLeftPower);
+//        frontRightMotor.setPower(frontRightPower);
+//        backRightMotor.setPower(backRightPower);
+//
+//        current_position = armotor.getCurrentPosition();
+//        telemetry.addData("Current Position", current_position);;
+//        if (gamepad2.x) {
+//            armotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            current_position = armotor.getCurrentPosition();
+//            telemetry.addData("Current Position:", current_position);
+//            if (current_position < max_position){
+//                armotor.setPower(1.0);
+//                telemetry.addData("Power set to: ", 0.25);
+//                armotor.setTargetPosition(max_position);
+//                telemetry.addData("Target Position Set To:", 700 );
+//                }
+//            else {
+//                telemetry.addLine("Max Height Reached");
+////                    armotor.setPower(0);
+//            }
+//
+//        }
+//
+//        if (gamepad2.b) {
+//            int startPosition;
+//            armotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            current_position = armotor.getCurrentPosition();
+//            telemetry.addData("Current Position:", current_position);
+//            if (current_position > min_position){
+//                armotor.setPower(-1.0);
+//                telemetry.addData("Power set to: ", -0.25);
+//                armotor.setTargetPosition(min_position);
+//                telemetry.addData("Target Position Set To:", 0);
+//                }
+//            else {
+//                telemetry.addLine("Min Height Reached");
+////                    armotor.setPower(0);
+//            }
+//
+//
+//        }
+//        grabber_current_position = grabberArmElevator.getCurrentPosition();
+//        telemetry.addData("Grabber current Position", grabber_current_position);
+//        if (gamepad2.y) {
+//            int startPosition;
+//            grabber_current_position = grabberArmElevator.getCurrentPosition();
+//            telemetry.addData("Current Position:", grabber_current_position);
+//
+//            if (grabber_current_position < grabber_max_position){
+//                grabberArmElevator.setPower(1);
+//                telemetry.addData("Grabber current position:", grabber_current_position);
+//                telemetry.addData("Power set to: ", 1);
+//                //grabberArmElevator.setTargetPosition(grabber_max_position);
+//                //telemetry.addData("Target Position Set To:", 700 );
+//                 }
+//            else {
+//                telemetry.addLine("Max Height Reached");
+//                grabberArmElevator.setPower(0);
+//            }
+//
+//
+//        }
+//        else{
+//            telemetry.addLine("none");
+//
+//        }
+//        if (gamepad2.a) {
+//            int startPosition;
+//            grabber_current_position = grabberArmElevator.getCurrentPosition();
+//            telemetry.addData("Current Position:", grabber_current_position);
+//            if (grabber_current_position > grabber_min_position) {
+//                grabberArmElevator.setPower(-1);
+//                telemetry.addData("Power set to: ", -1);
+//                telemetry.addData("Grabber current position:", grabber_current_position);
+//                //grabberArmElevator.setTargetPosition(grabber_min_position);
+//                //telemetry.addData("Target Position Set To:", 0);
+//            } else {
+//                telemetry.addLine("Min Height Reached");
+//                grabberArmElevator.setPower(0);
+//            }
+//
+//
+//
+//
+//        }
+//        else{
+//            telemetry.addLine("N/A");
+//
+//        }
+//        if (!gamepad2.y && !gamepad2.a){
+//            grabberArmElevator.setPower(0);
+//            telemetry.addLine("no buttons power = 0");
+//        }
         //grabberArmElevator.setPower(0);
         if (gamepad2.right_stick_button) {
             telemetry.addLine("opening claw");
-            servo1.setPosition(0.4);
+            servo1.setPosition(0.35);
         }
         if(gamepad2.left_stick_button) {
             servo1.setPosition(0);
             telemetry.addLine("closing claw");
 
         }
-        if (gamepad2.left_bumper) {
-            if(safety_net){
-                safety_net = false;
-                telemetry.addData("Safety Net: ",  safety_net);
-                }
-            else{
-                safety_net = true;
-                telemetry.addData("Safety Net: ",  safety_net);}
+//        if (gamepad2.left_bumper) {
+//            if(safety_net){
+//                safety_net = false;
+//                telemetry.addData("Safety Net: ",  safety_net);
+//                }
+//            else{
+//                safety_net = true;
+//                telemetry.addData("Safety Net: ",  safety_net);}
+//        }
+//
+//        //         armotor.setPower(0);
+//
+//
+//        telemetry.update();
         }
-
-        //         armotor.setPower(0);
-
-
-        telemetry.update();}
 
     /*
      * Code to run ONCE after the driver hits STOP
