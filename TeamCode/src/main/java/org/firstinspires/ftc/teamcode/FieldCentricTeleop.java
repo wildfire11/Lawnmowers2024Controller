@@ -74,6 +74,7 @@ public class FieldCentricTeleop extends OpMode
     int grabber_min_position = 0;
     double grabber_current_position = 0.0;
     boolean safety_net = true;
+    int level = 1;
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -236,24 +237,54 @@ public class FieldCentricTeleop extends OpMode
 
 
         }
+
+
+        //LEVEL 1(ground) = 0
+        //LEVEL 2(clip pick up position) = 10 IN 1,088 ROT
+        //LEVEL 3(low bar ready to clip) = 12 IN 1305.6 ROT
+        //LEVEL 4(high bar ready to clip) = 24.5 IN 2665.6 ROT
+        if (gamepad2.right_bumper){
+            level = level + 1;
+                    if (level == 5){
+                        level = 1;
+                    }
+        }
         grabber_current_position = grabberArmElevator.getCurrentPosition();
         telemetry.addData("Grabber current Position", grabber_current_position);
         if (gamepad2.y) {
             int startPosition;
+            grabberArmElevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             grabber_current_position = grabberArmElevator.getCurrentPosition();
             telemetry.addData("Current Position:", grabber_current_position);
 
-            if (grabber_current_position < grabber_max_position){
+            if (level == 1){
+                grabberArmElevator.setTargetPosition(0);
                 grabberArmElevator.setPower(1);
-                telemetry.addData("Grabber current position:", grabber_current_position);
-                telemetry.addData("Power set to: ", 1);
-                //grabberArmElevator.setTargetPosition(grabber_max_position);
-                //telemetry.addData("Target Position Set To:", 700 );
-                 }
-            else {
-                telemetry.addLine("Max Height Reached");
-                grabberArmElevator.setPower(0);
             }
+            if (level == 2){
+                grabberArmElevator.setTargetPosition(1088);
+                grabberArmElevator.setPower(1);
+            }
+            if (level == 3){
+                grabberArmElevator.setTargetPosition(1305);
+                grabberArmElevator.setPower(1);
+            }
+            if (level == 4){
+                grabberArmElevator.setTargetPosition(2665);
+                grabberArmElevator.setPower(1);
+            }
+
+//            if (grabber_current_position < grabber_max_position){
+//                grabberArmElevator.setPower(1);
+//                telemetry.addData("Grabber current position:", grabber_current_position);
+//                telemetry.addData("Power set to: ", 1);
+//                //grabberArmElevator.setTargetPosition(grabber_max_position);
+//                //telemetry.addData("Target Position Set To:", 700 );
+//                 }
+//            else {
+//                telemetry.addLine("Max Height Reached");
+//                grabberArmElevator.setPower(0);
+//            }
 
 
         }
@@ -261,29 +292,29 @@ public class FieldCentricTeleop extends OpMode
             telemetry.addLine("none");
 
         }
-        if (gamepad2.a) {
-            int startPosition;
-            grabber_current_position = grabberArmElevator.getCurrentPosition();
-            telemetry.addData("Current Position:", grabber_current_position);
-            if (grabber_current_position > grabber_min_position) {
-                grabberArmElevator.setPower(-1);
-                telemetry.addData("Power set to: ", -1);
-                telemetry.addData("Grabber current position:", grabber_current_position);
-                //grabberArmElevator.setTargetPosition(grabber_min_position);
-                //telemetry.addData("Target Position Set To:", 0);
-            } else {
-                telemetry.addLine("Min Height Reached");
-                grabberArmElevator.setPower(0);
-            }
-
-
-
-
-        }
-        else{
-            telemetry.addLine("N/A");
-
-        }
+//        if (gamepad2.a) {
+//            int startPosition;
+//            grabber_current_position = grabberArmElevator.getCurrentPosition();
+//            telemetry.addData("Current Position:", grabber_current_position);
+//            if (grabber_current_position > grabber_min_position) {
+//                grabberArmElevator.setPower(-1);
+//                telemetry.addData("Power set to: ", -1);
+//                telemetry.addData("Grabber current position:", grabber_current_position);
+//                //grabberArmElevator.setTargetPosition(grabber_min_position);
+//                //telemetry.addData("Target Position Set To:", 0);
+//            } else {
+//                telemetry.addLine("Min Height Reached");
+//                grabberArmElevator.setPower(0);
+//            }
+//
+//
+//
+//
+//        }
+//        else{
+//            telemetry.addLine("N/A");
+//
+//        }
         if (!gamepad2.y && !gamepad2.a){
             grabberArmElevator.setPower(0);
             telemetry.addLine("no buttons power = 0");
