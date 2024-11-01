@@ -166,9 +166,17 @@ public class FieldCentricTeleop extends OpMode
 
     @Override
     public void loop() {
-        double y = -gamepad1.left_stick_y * .5; // Remember, Y stick value is reversed
-        double x = gamepad1.left_stick_x * .5;
-        double rx = -gamepad1.right_stick_x * .5;
+        double y = 0;
+        double x = 0;
+        double rx = 0;
+        if (gamepad1.a) {
+         y = -gamepad1.left_stick_y ; // Remember, Y stick value is reversed
+         x = gamepad1.left_stick_x ;
+         rx = -gamepad1.right_stick_x ;}
+       else {
+         y = -gamepad1.left_stick_y * .5; // Remember, Y stick value is reversed
+         x = gamepad1.left_stick_x * .5;
+         rx = -gamepad1.right_stick_x * .5;}
 
         // This button choice was made so that it is hard to hit on accident,
         // it can be freely changed based on preference.
@@ -289,11 +297,11 @@ public class FieldCentricTeleop extends OpMode
             telemetry.addLine("no buttons power = 0");
         }
         //grabberArmElevator.setPower(0);
-        if (gamepad2.right_stick_button) {
+        if (gamepad2.right_bumper) {
             telemetry.addLine("opening claw");
-            servo1.setPosition(0.35);
+            servo1.setPosition(0.6);
         }
-        if(gamepad2.left_stick_button) {
+        if(gamepad2.left_bumper) {
             servo1.setPosition(0);
             telemetry.addLine("closing claw");
 
