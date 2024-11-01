@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -45,6 +46,7 @@ import com.qualcomm.robotcore.hardware.Servo;
  *
  * Challenge: refactor this code to test all 4 motors, one at a time.
  */
+@Disabled
 @TeleOp(name = "Ramp Motor Speed Tests", group = "Lawnmower Tests")
 public class MotorRampTests extends LinearOpMode {
 
