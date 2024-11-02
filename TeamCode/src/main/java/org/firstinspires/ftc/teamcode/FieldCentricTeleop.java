@@ -162,51 +162,56 @@ public class FieldCentricTeleop extends OpMode {
 
     @Override
     public void loop() {
-        double y = 0;
-        double x = 0;
-        double rx = 0;
+        try {
+            double y = 0;
+            double x = 0;
+            double rx = 0;
 
-        //Run in sprint mode if A is pressed
-        if (gamepad1.a) {
-            y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
-            x = gamepad1.left_stick_x;
-            rx = -gamepad1.right_stick_x;
-        } else {
-            y = -gamepad1.left_stick_y * .5; // Remember, Y stick value is reversed
-            x = gamepad1.left_stick_x * .5;
-            rx = -gamepad1.right_stick_x * .5;
+            //Run in sprint mode if A is pressed
+            if (gamepad1.a) {
+                y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
+                x = gamepad1.left_stick_x;
+                rx = -gamepad1.right_stick_x;
+            } else {
+                y = -gamepad1.left_stick_y * .5; // Remember, Y stick value is reversed
+                x = gamepad1.left_stick_x * .5;
+                rx = -gamepad1.right_stick_x * .5;
+            }
+
+            // This button choice was made so that it is hard to hit on accident,
+            // it can be freely changed based on preference.
+            // The equivalent button is start on Xbox-style controllers.
+            if (gamepad1.options)
+            { imu.resetYaw();
+                telemetry.addLine("Resetting imu yaw");
+            }
+
+            double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+            telemetry.addData("Heading", botHeading);
+
+            // Rotate the movement direction counter to the bot's rotation
+            double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
+            double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
+
+            rotX = rotX * 1;  // Counteract imperfect strafing
+
+            // Denominator is the largest motor power (absolute value) or 1
+            // This ensures all the powers maintain the same ratio,
+            // but only if at least one is out of the range [-1, 1]
+            double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
+            double frontLeftPower = (rotY + rotX + rx) / denominator;
+            double backLeftPower = (rotY - rotX + rx) / denominator;
+            double frontRightPower = (rotY - rotX - rx) / denominator;
+            double backRightPower = (rotY + rotX - rx) / denominator;
+
+            frontLeftMotor.setPower(frontLeftPower);
+            backLeftMotor.setPower(backLeftPower);
+            frontRightMotor.setPower(frontRightPower);
+            backRightMotor.setPower(backRightPower);
+        } catch (Exception e) {
+            telemetry.addData("IMU Error", e.getMessage());
+            telemetry.update();
         }
-
-        // This button choice was made so that it is hard to hit on accident,
-        // it can be freely changed based on preference.
-        // The equivalent button is start on Xbox-style controllers.
-        if (gamepad1.options)
-        { imu.resetYaw();
-            telemetry.addLine("Resetting imu yaw");
-        }
-
-        double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-        telemetry.addData("Heading", botHeading);
-
-        // Rotate the movement direction counter to the bot's rotation
-        double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
-        double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
-
-        rotX = rotX * 1;  // Counteract imperfect strafing
-
-        // Denominator is the largest motor power (absolute value) or 1
-        // This ensures all the powers maintain the same ratio,
-        // but only if at least one is out of the range [-1, 1]
-        double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
-        double frontLeftPower = (rotY + rotX + rx) / denominator;
-        double backLeftPower = (rotY - rotX + rx) / denominator;
-        double frontRightPower = (rotY - rotX - rx) / denominator;
-        double backRightPower = (rotY + rotX - rx) / denominator;
-
-        frontLeftMotor.setPower(frontLeftPower);
-        backLeftMotor.setPower(backLeftPower);
-        frontRightMotor.setPower(frontRightPower);
-        backRightMotor.setPower(backRightPower);
 
         current_position = armotor.getCurrentPosition();
         telemetry.addData("Current Position", current_position);
