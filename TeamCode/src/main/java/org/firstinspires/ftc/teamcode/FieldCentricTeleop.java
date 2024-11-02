@@ -29,6 +29,9 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -39,6 +42,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 /*
@@ -55,9 +59,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name=" 9895 Main TeleOp ", group="Iterative OpMode")
-public class FieldCentricTeleop extends OpMode
-{
+@Config
+@TeleOp(name = " 9895 Main TeleOp ", group = "Iterative OpMode")
+public class FieldCentricTeleop extends OpMode {
     private DcMotor frontLeftMotor = null;
     private DcMotor backLeftMotor = null;
     private DcMotor frontRightMotor = null;
@@ -65,17 +69,18 @@ public class FieldCentricTeleop extends OpMode
     DcMotor armotor;
     Servo servo1;
     DcMotor grabberArmElevator;
-    static final int    CYCLE_MS    =   50;     // period of each cycle
+    static final int CYCLE_MS = 50;     // period of each cycle
     IMU imu = null;
-    int max_position = 36320;
-    int min_position = 200;
+    public int max_position = 36320;
+    public int min_position = 200;
     double current_position = 0.0;
-    int grabber_max_position = 3000;
-    int grabber_min_position = 0;
+    public int grabber_max_position = 3000;
+    public int grabber_min_position = 0;
     double grabber_current_position = 0.0;
-    boolean safety_net = true;
+    public boolean safety_net = true;
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
+    Telemetry telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
 
 
     /*
@@ -84,8 +89,8 @@ public class FieldCentricTeleop extends OpMode
     @Override
     public void init() {
         // Retrieve the IMU from the hardware map
-        imu =  hardwareMap.get(IMU.class, "imu");
-        servo1=hardwareMap.get(Servo.class,"servo");
+        imu = hardwareMap.get(IMU.class, "imu");
+        servo1 = hardwareMap.get(Servo.class, "servo");
         // Adjust the orientation parameters to match your robot
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
@@ -94,9 +99,10 @@ public class FieldCentricTeleop extends OpMode
         imu.initialize(parameters);
         telemetry.addData("Status", "Initialized");
 
-        if (gamepad1.options) {
-            imu.resetYaw();
-        }
+        imu.resetYaw();
+        telemetry.addLine("Resetting imu yaw.");
+        double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        telemetry.addData("Heading", botHeading);
         // Connect to motor (Assume standard left wheel)
         // Change the text in quotes to match any motor name on your robot.
         armotor = hardwareMap.get(DcMotor.class, "armotor");
@@ -104,20 +110,9 @@ public class FieldCentricTeleop extends OpMode
         armotor.setTargetPosition(0);
         armotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-
-//THIS IS VERY USEFUL :)
-        // Wait for the start button
-        telemetry.addData(">", "Press Start to run Motors." );
-        telemetry.update();
         grabberArmElevator = hardwareMap.get(DcMotor.class, "grabberArmElevator");
         grabberArmElevator.setDirection(DcMotorSimple.Direction.FORWARD);
-//        grabberArmElevator.setTargetPosition(0);
         grabberArmElevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//THIS IS VERY USEFUL :)
-        // Wait for the start button
-        telemetry.addData(">", "Press Start to run Motors." );
-        telemetry.update();
-
 
 
 
@@ -137,7 +132,8 @@ public class FieldCentricTeleop extends OpMode
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
 
         // Tell the driver that initialization is complete.
-        telemetry.addData("Status", "Initialized");
+        telemetry.addData("Status", "Initialized.  Press start to run opmode.");
+        telemetry.update();
     }
 
     /*
@@ -169,23 +165,28 @@ public class FieldCentricTeleop extends OpMode
         double y = 0;
         double x = 0;
         double rx = 0;
+
+        //Run in sprint mode if A is pressed
         if (gamepad1.a) {
-         y = -gamepad1.left_stick_y ; // Remember, Y stick value is reversed
-         x = gamepad1.left_stick_x ;
-         rx = -gamepad1.right_stick_x ;}
-       else {
-         y = -gamepad1.left_stick_y * .5; // Remember, Y stick value is reversed
-         x = gamepad1.left_stick_x * .5;
-         rx = -gamepad1.right_stick_x * .5;}
+            y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
+            x = gamepad1.left_stick_x;
+            rx = -gamepad1.right_stick_x;
+        } else {
+            y = -gamepad1.left_stick_y * .5; // Remember, Y stick value is reversed
+            x = gamepad1.left_stick_x * .5;
+            rx = -gamepad1.right_stick_x * .5;
+        }
 
         // This button choice was made so that it is hard to hit on accident,
         // it can be freely changed based on preference.
         // The equivalent button is start on Xbox-style controllers.
-        if (gamepad1.options) {
-            imu.resetYaw();
+        if (gamepad1.options)
+        { imu.resetYaw();
+            telemetry.addLine("Resetting imu yaw");
         }
 
         double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        telemetry.addData("Heading", botHeading);
 
         // Rotate the movement direction counter to the bot's rotation
         double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
@@ -208,18 +209,18 @@ public class FieldCentricTeleop extends OpMode
         backRightMotor.setPower(backRightPower);
 
         current_position = armotor.getCurrentPosition();
-        telemetry.addData("Current Position", current_position);;
+        telemetry.addData("Current Position", current_position);
+        ;
         if (gamepad2.x) {
             armotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             current_position = armotor.getCurrentPosition();
             telemetry.addData("Current Position:", current_position);
-            if (current_position < max_position){
+            if (current_position < max_position) {
                 armotor.setPower(1.0);
                 telemetry.addData("Power set to: ", 0.25);
                 armotor.setTargetPosition(max_position);
-                telemetry.addData("Target Position Set To:", 700 );
-                }
-            else {
+                telemetry.addData("Target Position Set To:", 700);
+            } else {
                 telemetry.addLine("Max Height Reached");
 //                    armotor.setPower(0);
             }
@@ -231,13 +232,12 @@ public class FieldCentricTeleop extends OpMode
             armotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             current_position = armotor.getCurrentPosition();
             telemetry.addData("Current Position:", current_position);
-            if (current_position > min_position){
+            if (current_position > min_position) {
                 armotor.setPower(-1.0);
                 telemetry.addData("Power set to: ", -0.25);
                 armotor.setTargetPosition(min_position);
                 telemetry.addData("Target Position Set To:", 0);
-                }
-            else {
+            } else {
                 telemetry.addLine("Min Height Reached");
 //                    armotor.setPower(0);
             }
@@ -251,21 +251,19 @@ public class FieldCentricTeleop extends OpMode
             grabber_current_position = grabberArmElevator.getCurrentPosition();
             telemetry.addData("Current Position:", grabber_current_position);
 
-            if (grabber_current_position < grabber_max_position){
+            if (grabber_current_position < grabber_max_position) {
                 grabberArmElevator.setPower(1);
                 telemetry.addData("Grabber current position:", grabber_current_position);
                 telemetry.addData("Power set to: ", 1);
                 //grabberArmElevator.setTargetPosition(grabber_max_position);
                 //telemetry.addData("Target Position Set To:", 700 );
-                 }
-            else {
+            } else {
                 telemetry.addLine("Max Height Reached");
                 grabberArmElevator.setPower(0);
             }
 
 
-        }
-        else{
+        } else {
             telemetry.addLine("none");
 
         }
@@ -285,14 +283,11 @@ public class FieldCentricTeleop extends OpMode
             }
 
 
-
-
-        }
-        else{
+        } else {
             telemetry.addLine("N/A");
 
         }
-        if (!gamepad2.y && !gamepad2.a){
+        if (!gamepad2.y && !gamepad2.a) {
             grabberArmElevator.setPower(0);
             telemetry.addLine("no buttons power = 0");
         }
@@ -301,25 +296,26 @@ public class FieldCentricTeleop extends OpMode
             telemetry.addLine("opening claw");
             servo1.setPosition(0.6);
         }
-        if(gamepad2.left_bumper) {
+        if (gamepad2.left_bumper) {
             servo1.setPosition(0);
             telemetry.addLine("closing claw");
 
         }
         if (gamepad2.left_bumper) {
-            if(safety_net){
+            if (safety_net) {
                 safety_net = false;
-                telemetry.addData("Safety Net: ",  safety_net);
-                }
-            else{
+                telemetry.addData("Safety Net: ", safety_net);
+            } else {
                 safety_net = true;
-                telemetry.addData("Safety Net: ",  safety_net);}
+                telemetry.addData("Safety Net: ", safety_net);
+            }
         }
 
         //         armotor.setPower(0);
 
 
-        telemetry.update();}
+        telemetry.update();
+    }
 
     /*
      * Code to run ONCE after the driver hits STOP
