@@ -72,15 +72,16 @@ public class FieldCentricTeleop extends OpMode {
     static final int CYCLE_MS = 50;     // period of each cycle
     IMU imu = null;
     public int max_position = 36320;
-    public int min_position = 200;
+    public static int min_position = 200;
     double current_position = 0.0;
-    public int grabber_max_position = 3000;
+    public int grabber_max_position = 3200;
     public int grabber_min_position = 0;
     double grabber_current_position = 0.0;
     public boolean safety_net = true;
+    public ButtonDebouncer DPadUpDebouncer = new ButtonDebouncer();
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    Telemetry telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
+    //Telemetry telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
 
 
     /*
@@ -88,6 +89,8 @@ public class FieldCentricTeleop extends OpMode {
      */
     @Override
     public void init() {
+        FtcDashboard dashboard = FtcDashboard.getInstance();
+        telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
         // Retrieve the IMU from the hardware map
         imu = hardwareMap.get(IMU.class, "imu");
         servo1 = hardwareMap.get(Servo.class, "servo");
@@ -186,8 +189,14 @@ public class FieldCentricTeleop extends OpMode {
                 telemetry.addLine("Resetting imu yaw");
             }
 
+            if (gamepad2.options){
+                grabberArmElevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                armotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            }
+
             double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-            telemetry.addData("Heading", botHeading);
+            double botHeadingDegrees = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+            telemetry.addData("Heading", botHeadingDegrees);
 
             // Rotate the movement direction counter to the bot's rotation
             double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
@@ -231,12 +240,18 @@ public class FieldCentricTeleop extends OpMode {
             }
 
         }
-
+        if (!safety_net && !gamepad2.b && !gamepad2.a){
+            armotor.setPower(0);
+        }
         if (gamepad2.b) {
             int startPosition;
             armotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             current_position = armotor.getCurrentPosition();
             telemetry.addData("Current Position:", current_position);
+            if (!safety_net){
+                armotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                armotor.setPower(-1);
+            }
             if (current_position > min_position) {
                 armotor.setPower(-1.0);
                 telemetry.addData("Power set to: ", -0.25);
@@ -253,6 +268,7 @@ public class FieldCentricTeleop extends OpMode {
         telemetry.addData("Grabber current Position", grabber_current_position);
         if (gamepad2.y) {
             int startPosition;
+            grabberArmElevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             grabber_current_position = grabberArmElevator.getCurrentPosition();
             telemetry.addData("Current Position:", grabber_current_position);
 
@@ -274,9 +290,10 @@ public class FieldCentricTeleop extends OpMode {
         }
         if (gamepad2.a) {
             int startPosition;
+            grabberArmElevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             grabber_current_position = grabberArmElevator.getCurrentPosition();
             telemetry.addData("Current Position:", grabber_current_position);
-            if (grabber_current_position > grabber_min_position) {
+            if (grabber_current_position > grabber_min_position || !safety_net) {
                 grabberArmElevator.setPower(-1);
                 telemetry.addData("Power set to: ", -1);
                 telemetry.addData("Grabber current position:", grabber_current_position);
@@ -306,7 +323,7 @@ public class FieldCentricTeleop extends OpMode {
             telemetry.addLine("closing claw");
 
         }
-        if (gamepad2.left_bumper) {
+        if (DPadUpDebouncer.getDebounced(gamepad2.dpad_up)) {
             if (safety_net) {
                 safety_net = false;
                 telemetry.addData("Safety Net: ", safety_net);
