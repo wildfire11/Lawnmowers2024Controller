@@ -74,10 +74,10 @@ public class FieldCentricTeleop extends OpMode {
     public int max_position = 36320;
     public static int min_position = 200;
     double current_position = 0.0;
-    public int grabber_max_position = 3200;
+    public static int grabber_max_position = 3800;
     public int grabber_min_position = 0;
-    double grabber_current_position = 0.0;
-    public boolean safety_net = true;
+    public static double grabber_current_position = 0.0;
+    public static boolean safety_net = true;
     public ButtonDebouncer DPadUpDebouncer = new ButtonDebouncer();
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -282,6 +282,7 @@ public class FieldCentricTeleop extends OpMode {
                 telemetry.addLine("Max Height Reached");
                 grabberArmElevator.setPower(0);
             }
+            telemetry.addData("Grabber Max Possition",grabber_max_position);
 
 
         } else {

@@ -25,7 +25,8 @@
  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+ *//*
+
 
 package org.firstinspires.ftc.teamcode;
 
@@ -51,6 +52,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.ArrayList;
 import java.util.List;
 
+*/
 /*
  * This OpMode illustrates the basics of AprilTag based localization.
  *
@@ -69,14 +71,16 @@ import java.util.List;
  *
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
- */
+ *//*
+
 @Disabled
 @TeleOp(name = "Concept: AprilTag Localization", group = "Concept")
 public class ConceptAprilTagLocalization extends LinearOpMode {
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
 
-    /**
+    */
+/**
      * Variables to store the position and orientation of the camera on the robot. Setting these
      * values requires a definition of the axes of the camera and robot:
      *
@@ -99,7 +103,8 @@ public class ConceptAprilTagLocalization extends LinearOpMode {
      * the camera is horizontal. Use a yaw of 0 if the camera is pointing forwards, +90 degrees if
      * it's pointing straight left, -90 degrees for straight right, etc. You can also set the roll
      * to +/-90 degrees if it's vertical, or 180 degrees if it's upside-down.
-     */
+     *//*
+
     long tagDetectTime;
     Pose2d localizerPose;
     static class Params {
@@ -117,14 +122,18 @@ public class ConceptAprilTagLocalization extends LinearOpMode {
     private YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES,
             0, -90, 0, 0);
 
-    /**
+    */
+/**
      * The variable to store our instance of the AprilTag processor.
-     */
+     *//*
+
     private AprilTagProcessor aprilTag;
 
-    /**
+    */
+/**
      * The variable to store our instance of the vision portal.
-     */
+     *//*
+
     private VisionPortal visionPortal;
     public Vector2d getVectorBasedOnTags() {
         ArrayList<AprilTagDetection> detections = aprilTag.getDetections();
@@ -141,11 +150,13 @@ public class ConceptAprilTagLocalization extends LinearOpMode {
                     .div(aprilTag.getDetections().size());
         }
     }
-    /**
+    */
+/**
      * getFCPosition credit Michael from team 14343 (@overkil on Discord)
      * @param botheading In Radians.
      * @return FC Pose of bot.
-     */
+     *//*
+
     public Vector2d getFCPosition(AprilTagDetection detection, double botheading, Vector2d cameraOffset) {
         // get coordinates of the robot in RC coordinates
         // ensure offsets are RC
@@ -154,7 +165,8 @@ public class ConceptAprilTagLocalization extends LinearOpMode {
                 detection.robotPose.getPosition().x,
                 detection.robotPose.getPosition().y
         );
-        /*double x = detection.ftcPose.x-cameraOffset.getX();
+        */
+/*double x = detection.ftcPose.x-cameraOffset.getX();
         double y = detection.ftcPose.y-cameraOffset.getY();
 
         // invert heading to correct properly
@@ -179,7 +191,8 @@ public class ConceptAprilTagLocalization extends LinearOpMode {
                     tagpose.get(0) - y2,
                     tagpose.get(1) + x2);
 
-        }*/
+        }*//*
+
     }
     @Override
     public void runOpMode() {
@@ -214,9 +227,11 @@ public class ConceptAprilTagLocalization extends LinearOpMode {
 
     }   // end method runOpMode()
 
-    /**
+    */
+/**
      * Initialize the AprilTag processor.
-     */
+     *//*
+
     private void initAprilTag() {
 
         // Create the AprilTag processor.
@@ -283,9 +298,11 @@ public class ConceptAprilTagLocalization extends LinearOpMode {
 
     }   // end method initAprilTag()
 
-    /**
+    */
+/**
      * Add telemetry about AprilTag detections.
-     */
+     *//*
+
     private void telemetryAprilTag() {
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
@@ -322,3 +339,4 @@ public class ConceptAprilTagLocalization extends LinearOpMode {
     }   // end method telemetryAprilTag()
 
 }   // end class
+*/
