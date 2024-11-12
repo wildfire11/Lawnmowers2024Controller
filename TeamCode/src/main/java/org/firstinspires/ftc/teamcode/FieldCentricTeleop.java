@@ -81,6 +81,8 @@ public class FieldCentricTeleop extends OpMode {
     public ButtonDebouncer DPadUpDebouncer = new ButtonDebouncer();
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
+
+    public LinearSlideElevator linearSlideElevator;
     //Telemetry telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
 
 
@@ -91,6 +93,7 @@ public class FieldCentricTeleop extends OpMode {
     public void init() {
         FtcDashboard dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
+        linearSlideElevator = new LinearSlideElevator(hardwareMap);
         // Retrieve the IMU from the hardware map
         imu = hardwareMap.get(IMU.class, "imu");
         servo1 = hardwareMap.get(Servo.class, "servo");
@@ -273,22 +276,23 @@ public class FieldCentricTeleop extends OpMode {
         grabber_current_position = grabberArmElevator.getCurrentPosition();
         telemetry.addData("Grabber current Position", grabber_current_position);
         if (gamepad2.y) {
-            int startPosition;
-            grabberArmElevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            grabber_current_position = grabberArmElevator.getCurrentPosition();
-            telemetry.addData("Current Position:", grabber_current_position);
-
-            if (grabber_current_position < grabber_max_position) {
-                grabberArmElevator.setPower(1);
-                telemetry.addData("Grabber current position:", grabber_current_position);
-                telemetry.addData("Power set to: ", 1);
-                //grabberArmElevator.setTargetPosition(grabber_max_position);
-                //telemetry.addData("Target Position Set To:", 700 );
-            } else {
-                telemetry.addLine("Max Height Reached");
-                grabberArmElevator.setPower(0);
-            }
-            telemetry.addData("Grabber Max Possition",grabber_max_position);
+//            int startPosition;
+//            grabberArmElevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//            grabber_current_position = grabberArmElevator.getCurrentPosition();
+//            telemetry.addData("Current Position:", grabber_current_position);
+//
+//            if (grabber_current_position < grabber_max_position) {
+//                grabberArmElevator.setPower(1);
+//                telemetry.addData("Grabber current position:", grabber_current_position);
+//                telemetry.addData("Power set to: ", 1);
+//                //grabberArmElevator.setTargetPosition(grabber_max_position);
+//                //telemetry.addData("Target Position Set To:", 700 );
+//            } else {
+//                telemetry.addLine("Max Height Reached");
+//                grabberArmElevator.setPower(0);
+//            }
+//            telemetry.addData("Grabber Max Possition",grabber_max_position);
+            linearSlideElevator.ClawUp();
 
 
         } else {
