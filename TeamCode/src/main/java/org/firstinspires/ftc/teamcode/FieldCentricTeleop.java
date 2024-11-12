@@ -185,7 +185,13 @@ public class FieldCentricTeleop extends OpMode {
             // it can be freely changed based on preference.
             // The equivalent button is start on Xbox-style controllers.
             if (gamepad1.options)
-            { imu.resetYaw();
+            { IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+                    RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+                    RevHubOrientationOnRobot.UsbFacingDirection.UP));
+// Without this, the REV Hub's orientation is assumed to be logo up / USB forward
+                imu.initialize(parameters);
+
+                imu.resetYaw();
                 telemetry.addLine("Resetting imu yaw");
             }
 
