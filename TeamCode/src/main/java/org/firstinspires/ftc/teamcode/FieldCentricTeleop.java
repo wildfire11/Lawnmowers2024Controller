@@ -272,15 +272,6 @@ public class FieldCentricTeleop extends OpMode {
 
 
         }
-        if (gamepad2.dpad_up){
-            linearSlideElevator.clawUp();
-        }
-        if (gamepad2.dpad_left){
-            linearSlideElevator.clawReadyToPull();
-        }
-        if (gamepad2.dpad_down)
-            linearSlideElevator.clawToFloor();
-
         if (gamepad2.y) {
             linearSlideElevator.ClawUp();
         } else {
