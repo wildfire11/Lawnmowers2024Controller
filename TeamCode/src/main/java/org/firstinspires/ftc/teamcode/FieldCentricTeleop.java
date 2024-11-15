@@ -92,7 +92,7 @@ public class FieldCentricTeleop extends OpMode {
     public void init() {
         FtcDashboard dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
-        linearSlideElevator = new LinearSlideElevator(hardwareMap);
+        linearSlideElevator = new LinearSlideElevator(hardwareMap, telemetry);
         // Retrieve the IMU from the hardware map
         imu = hardwareMap.get(IMU.class, "imu");
         servo1 = hardwareMap.get(Servo.class, "servo");
@@ -248,7 +248,7 @@ public class FieldCentricTeleop extends OpMode {
             }
 
         }
-        if (!safety_net && !gamepad2.b && !gamepad2.a){
+        if (!safety_net && !gamepad2.b && !gamepad2.a ){
             armotor.setPower(0);
         }
         if (gamepad2.b) {
@@ -272,6 +272,14 @@ public class FieldCentricTeleop extends OpMode {
 
 
         }
+        if (gamepad2.dpad_up){
+            linearSlideElevator.clawUp();
+        }
+        if (gamepad2.dpad_left){
+            linearSlideElevator.clawReadyToPull();
+        }
+        if (gamepad2.dpad_down)
+            linearSlideElevator.clawToFloor();
 
         if (gamepad2.y) {
             linearSlideElevator.ClawUp();
@@ -288,7 +296,7 @@ public class FieldCentricTeleop extends OpMode {
 
         }
         if (!gamepad2.y && !gamepad2.a) {
-            grabberArmElevator.setPower(0);
+           // grabberArmElevator.setPower(0);
             telemetry.addLine("no buttons power = 0");
         }
         //grabberArmElevator.setPower(0);
