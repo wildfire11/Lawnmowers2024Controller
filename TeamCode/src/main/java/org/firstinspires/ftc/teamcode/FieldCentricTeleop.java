@@ -74,8 +74,7 @@ public class FieldCentricTeleop extends OpMode {
     public int max_position = 36320;
     public static int min_position = 200;
     double current_position = 0.0;
-    public static int grabber_max_position = 3800;
-    public int grabber_min_position = 0;
+
     public static double grabber_current_position = 0.0;
     public static boolean safety_net = true;
     public ButtonDebouncer DPadUpDebouncer = new ButtonDebouncer();
@@ -273,47 +272,15 @@ public class FieldCentricTeleop extends OpMode {
 
 
         }
-        grabber_current_position = grabberArmElevator.getCurrentPosition();
-        telemetry.addData("Grabber current Position", grabber_current_position);
+
         if (gamepad2.y) {
-//            int startPosition;
-//            grabberArmElevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//            grabber_current_position = grabberArmElevator.getCurrentPosition();
-//            telemetry.addData("Current Position:", grabber_current_position);
-//
-//            if (grabber_current_position < grabber_max_position) {
-//                grabberArmElevator.setPower(1);
-//                telemetry.addData("Grabber current position:", grabber_current_position);
-//                telemetry.addData("Power set to: ", 1);
-//                //grabberArmElevator.setTargetPosition(grabber_max_position);
-//                //telemetry.addData("Target Position Set To:", 700 );
-//            } else {
-//                telemetry.addLine("Max Height Reached");
-//                grabberArmElevator.setPower(0);
-//            }
-//            telemetry.addData("Grabber Max Possition",grabber_max_position);
             linearSlideElevator.ClawUp();
-
-
         } else {
             telemetry.addLine("none");
 
         }
         if (gamepad2.a) {
-            int startPosition;
-            grabberArmElevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            grabber_current_position = grabberArmElevator.getCurrentPosition();
-            telemetry.addData("Current Position:", grabber_current_position);
-            if (grabber_current_position > grabber_min_position || !safety_net) {
-                grabberArmElevator.setPower(-1);
-                telemetry.addData("Power set to: ", -1);
-                telemetry.addData("Grabber current position:", grabber_current_position);
-                //grabberArmElevator.setTargetPosition(grabber_min_position);
-                //telemetry.addData("Target Position Set To:", 0);
-            } else {
-                telemetry.addLine("Min Height Reached");
-                grabberArmElevator.setPower(0);
-            }
+        linearSlideElevator.ClawDown();
 
 
         } else {
@@ -326,20 +293,20 @@ public class FieldCentricTeleop extends OpMode {
         }
         //grabberArmElevator.setPower(0);
         if (gamepad2.right_bumper) {
-            telemetry.addLine("opening claw");
-            servo1.setPosition(0.6);
+            linearSlideElevator.ClawOpen();
         }
         if (gamepad2.left_bumper) {
-            servo1.setPosition(0);
-            telemetry.addLine("closing claw");
+           linearSlideElevator.ClawClosed();
 
         }
         if (DPadUpDebouncer.getDebounced(gamepad2.dpad_up)) {
             if (safety_net) {
                 safety_net = false;
+                linearSlideElevator.safety_net = safety_net;
                 telemetry.addData("Safety Net: ", safety_net);
             } else {
                 safety_net = true;
+                linearSlideElevator.safety_net = safety_net;
                 telemetry.addData("Safety Net: ", safety_net);
             }
         }
