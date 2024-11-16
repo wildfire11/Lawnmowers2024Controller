@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
@@ -10,28 +11,80 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import org.firstinspires.ftc.teamcode.MecanumDrive;
-
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+class MoveArm {
+    private LinearSlideElevator linearSlideElevator = null;
+     public MoveArm(HardwareMap hardwareMap, Telemetry telemetry){
+         linearSlideElevator = new LinearSlideElevator(hardwareMap, telemetry);
+    }
+    public class JustBelowTopBar implements Action {
+        private boolean initialized = false;
+        private LinearSlideElevator linearSlideElevator = null;
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                linearSlideElevator.clawUp();
+                initialized = true;
+            }
+
+            return false;
+        }
+    }
+    public class AtTopBar implements Action {
+        private boolean initialized = false;
+        private LinearSlideElevator linearSlideElevator = null;
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                linearSlideElevator.clawReadyToPull();
+                initialized = true;
+            }
+
+            return false;
+        }
+    }
+
+    public Action justBelowTopBar() {
+        return new JustBelowTopBar();
+    }
+
+    public Action atTopBar() {
+         return new AtTopBar();
+    }
+
+}
+
+
 
 @Config
 @Autonomous(name = "Simple Auton Teleop", group = "Autonomous")
 public class SimpleStrafeAuton extends LinearOpMode {
 
-    private LinearSlideElevator linearSlideElevator = null;
+
     @Override
     public void runOpMode() {
+
         Pose2d initialPose = new Pose2d(11.8, 61.7, Math.toRadians(90));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
-        linearSlideElevator = new LinearSlideElevator(hardwareMap, telemetry);
+        MoveArm moveArm = new MoveArm(hardwareMap, telemetry);
         // vision here that outputs position
         int visionOutputPosition = 1;
 
         TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
-                .strafeTo(new Vector2d(57,-62));
+
+                .turn(90)
+                .strafeTo(new Vector2d(-40,-30))
+                .lineToY(-30);
+
+        TrajectoryActionBuilder moveAfterArmUp = drive.actionBuilder(initialPose)
+                .lineToY(-45);
+
 
 
 
@@ -79,8 +132,14 @@ public class SimpleStrafeAuton extends LinearOpMode {
         Actions.runBlocking(
                 new SequentialAction(
                         trajectoryActionChosen,
-                        trajectoryActionCloseOut
+                        trajectoryActionCloseOut,
+                        moveArm.justBelowTopBar(),
+                        moveAfterArmUp.build(),
+                        moveArm.atTopBar()
+
+
                 )
         );
     }
 }
+
