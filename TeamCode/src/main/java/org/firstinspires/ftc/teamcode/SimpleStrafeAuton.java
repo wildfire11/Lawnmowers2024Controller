@@ -70,7 +70,7 @@ public class SimpleStrafeAuton extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        Pose2d initialPose = new Pose2d(11.8, 61.7, Math.toRadians(90));
+        Pose2d initialPose = new Pose2d(11.8, 61.7, Math.toRadians(0));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
         MoveArm moveArm = new MoveArm(hardwareMap, telemetry);
         // vision here that outputs position
@@ -78,12 +78,12 @@ public class SimpleStrafeAuton extends LinearOpMode {
 
         TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
 
-                .turn(90)
-                .strafeTo(new Vector2d(-40,-30))
-                .lineToY(-30);
+                .turn(Math.PI/2)
+                .strafeTo(new Vector2d(-40,-30));
+                //.lineToY(-30);
 
-        TrajectoryActionBuilder moveAfterArmUp = drive.actionBuilder(initialPose)
-                .lineToY(-45);
+//        TrajectoryActionBuilder moveAfterArmUp = drive.actionBuilder(initialPose)
+//                .lineToY(-45);
 
 
 
@@ -131,11 +131,11 @@ public class SimpleStrafeAuton extends LinearOpMode {
 
         Actions.runBlocking(
                 new SequentialAction(
-                        trajectoryActionChosen,
-                        trajectoryActionCloseOut,
-                        moveArm.justBelowTopBar(),
-                        moveAfterArmUp.build(),
-                        moveArm.atTopBar()
+                        trajectoryActionChosen
+                        //trajectoryActionCloseOut,
+                        //moveArm.justBelowTopBar(),
+                        //moveAfterArmUp.build(),
+                        //moveArm.atTopBar()
 
 
                 )
