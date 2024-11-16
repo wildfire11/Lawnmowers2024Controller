@@ -287,7 +287,7 @@ public class FieldCentricTeleop extends OpMode {
 
         }
         if (!gamepad2.y && !gamepad2.a) {
-           // grabberArmElevator.setPower(0);
+            linearSlideElevator.stopMovingIfNotTarget();
             telemetry.addLine("no buttons power = 0");
         }
         //grabberArmElevator.setPower(0);

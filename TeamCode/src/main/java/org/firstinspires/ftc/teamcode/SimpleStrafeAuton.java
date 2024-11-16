@@ -21,16 +21,19 @@ import com.qualcomm.robotcore.hardware.Servo;
 @Autonomous(name = "Simple Auton Teleop", group = "Autonomous")
 public class SimpleStrafeAuton extends LinearOpMode {
 
+    private LinearSlideElevator linearSlideElevator = null;
     @Override
     public void runOpMode() {
         Pose2d initialPose = new Pose2d(11.8, 61.7, Math.toRadians(90));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
-
+        linearSlideElevator = new LinearSlideElevator(hardwareMap, telemetry);
         // vision here that outputs position
         int visionOutputPosition = 1;
 
         TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
                 .strafeTo(new Vector2d(57,-62));
+
+
 
         TrajectoryActionBuilder tab2 = drive.actionBuilder(initialPose);
 //                .lineToY(37)

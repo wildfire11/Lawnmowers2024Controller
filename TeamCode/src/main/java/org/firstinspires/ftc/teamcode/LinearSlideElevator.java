@@ -18,6 +18,20 @@ public class LinearSlideElevator{
     public boolean safety_net = true;
     Servo servo1;
     public static int clawReadyToPullHeight = 2800;
+    public boolean isRunningToPosition = false;
+    public void stopMovingIfNotTarget() {
+        if (isRunningToPosition) {
+            grabber_current_position = grabberArmElevator.getCurrentPosition();
+            double grabber_target_position = grabberArmElevator.getTargetPosition();
+            if(grabber_current_position <= grabber_target_position + 50 && grabber_current_position >= grabber_target_position - 50) {
+                grabberArmElevator.setPower(0);
+                isRunningToPosition = false;
+            }
+        } else { grabberArmElevator.setPower(0);
+
+        }
+    }
+
 
 
     public LinearSlideElevator(HardwareMap hardwareMap, Telemetry telemetry){
@@ -87,5 +101,16 @@ public class LinearSlideElevator{
     public void ClawClosed(){
         servo1.setPosition(0);
         _telemetry.addLine("closing claw");
+
+
+    }
+
+    public DcMotor getGrabberArmElevator() {
+        return grabberArmElevator;
     }
 }
+
+
+
+
+
