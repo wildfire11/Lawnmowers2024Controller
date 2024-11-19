@@ -33,7 +33,6 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -42,8 +41,8 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.hardwareControls.LinearSlideElevator;
 
 /*
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -272,30 +271,15 @@ public class FieldCentricTeleop extends OpMode {
 
 
         }
-        if (gamepad2.y) {
-            linearSlideElevator.ClawUp();
-        } else {
-            telemetry.addLine("none");
 
-        }
-        if (gamepad2.a) {
-        linearSlideElevator.ClawDown();
+        //Handles manual up and down control for the claw elevator
+        linearSlideElevator.handleTeleop(gamepad2.y, gamepad2.a);
 
-
-        } else {
-            telemetry.addLine("N/A");
-
-        }
-        if (!gamepad2.y && !gamepad2.a) {
-            linearSlideElevator.stopMovingIfNotTarget();
-            telemetry.addLine("no buttons power = 0");
-        }
-        //grabberArmElevator.setPower(0);
         if (gamepad2.right_bumper) {
-            linearSlideElevator.ClawOpen();
+            linearSlideElevator.executeAction(linearSlideElevator.clawOpenAction());
         }
         if (gamepad2.left_bumper) {
-           linearSlideElevator.ClawClosed();
+           linearSlideElevator.executeAction(linearSlideElevator.clawCloseAction());
 
         }
         if (DPadUpDebouncer.getDebounced(gamepad2.dpad_up)) {
@@ -312,7 +296,7 @@ public class FieldCentricTeleop extends OpMode {
 
         //         armotor.setPower(0);
 
-
+        linearSlideElevator.processAction();
         telemetry.update();
     }
 
