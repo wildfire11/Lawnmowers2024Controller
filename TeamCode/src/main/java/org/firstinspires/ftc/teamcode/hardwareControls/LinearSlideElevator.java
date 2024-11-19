@@ -78,6 +78,7 @@ public class LinearSlideElevator {
     }
 
     public Action clawJustUnderTopBarAction() {
+        telemetry.addLine("Just under top bar");
         return createAction(() -> moveElevator(clawJustUnderTopBarHeight, 1));
     }
 
