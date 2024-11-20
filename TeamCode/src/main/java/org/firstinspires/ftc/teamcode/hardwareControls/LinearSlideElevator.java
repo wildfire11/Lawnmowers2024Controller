@@ -37,6 +37,7 @@ public class LinearSlideElevator {
 
     // Centralized logic for elevator movement
     private void moveElevator(int targetPosition, double power) {
+        telemetry.addData("Elevator target position: ", targetPosition);
         grabberArmElevator.setTargetPosition(targetPosition);
         grabberArmElevator.setPower(power);
         grabberArmElevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -78,7 +79,6 @@ public class LinearSlideElevator {
     }
 
     public Action clawJustUnderTopBarAction() {
-        telemetry.addLine("Just under top bar");
         return createAction(() -> moveElevator(clawJustUnderTopBarHeight, 1));
     }
 
@@ -92,15 +92,17 @@ public class LinearSlideElevator {
 
     public Action clawOpenAction() {
         return createAction(() -> {
-            servo1.setPosition(0.6);
-            telemetry.addLine("Claw opened");
+            double clawOpenPosition = 0.6;
+            telemetry.addData("Claw position: ", clawOpenPosition);
+            servo1.setPosition(clawOpenPosition);
         });
     }
 
     public Action clawCloseAction() {
         return createAction(() -> {
-            servo1.setPosition(0);
-            telemetry.addLine("Claw closed");
+            double clawClosePosition = 0;
+            telemetry.addData("Claw position: ", clawClosePosition);
+            servo1.setPosition(clawClosePosition);
         });
     }
 
@@ -111,6 +113,9 @@ public class LinearSlideElevator {
 
     // Call this in the main loop to process the current action
     public void processAction() {
+        telemetry.addLine()
+                .addData("grabber arm continuous?", continuousMovement)
+                .addData("grabber arm processing action? ", currentAction != null);
         if (currentAction != null) {
             TelemetryPacket packet = new TelemetryPacket();
             if (!currentAction.run(packet)) {
