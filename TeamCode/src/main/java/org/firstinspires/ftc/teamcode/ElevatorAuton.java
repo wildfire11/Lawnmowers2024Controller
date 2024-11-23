@@ -13,8 +13,8 @@ import org.firstinspires.ftc.teamcode.hardwareControls.LinearSlideElevator;
 
 
 @Config
-@Autonomous(name = "Simple Auton Teleop", group = "Autonomous")
-public class SimpleStrafeAuton extends LinearOpMode {
+@Autonomous(name = "Elevator Test Auton", group = "Autonomous")
+public class ElevatorAuton extends LinearOpMode {
 
     private double unitsPerInch =73.4/45 ;
     @Override
@@ -51,7 +51,6 @@ public class SimpleStrafeAuton extends LinearOpMode {
         Actions.runBlocking(
                 new SequentialAction(
                         driveToBar.build()
-                        //linearSlideActions.clawJustUnderTopBarAction()
                         //trajectoryActionCloseOut,
                         //moveArm.justBelowTopBar(),
                         //moveAfterArmUp.build(),
@@ -60,10 +59,12 @@ public class SimpleStrafeAuton extends LinearOpMode {
 
                 )
         );
+        telemetry.addLine("Test");
 
-//        Actions.runBlocking(new SequentialAction(
-//                linearSlideActions.clawJustUnderTopBarAction()
-//        ));
+
+        Actions.runBlocking(new SequentialAction(
+                linearSlideActions.clawJustUnderTopBarAction()
+        ));
     }
 }
 

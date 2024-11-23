@@ -33,7 +33,6 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -42,8 +41,8 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.hardwareControls.LinearSlideElevator;
 
 /*
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -74,8 +73,7 @@ public class FieldCentricTeleop extends OpMode {
     public int max_position = 36320;
     public static int min_position = 200;
     double current_position = 0.0;
-    public static int grabber_max_position = 3800;
-    public int grabber_min_position = 0;
+
     public static double grabber_current_position = 0.0;
     public static boolean safety_net = true;
     public ButtonDebouncer DPadUpDebouncer = new ButtonDebouncer();
@@ -93,7 +91,7 @@ public class FieldCentricTeleop extends OpMode {
     public void init() {
         FtcDashboard dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
-        linearSlideElevator = new LinearSlideElevator(hardwareMap);
+        linearSlideElevator = new LinearSlideElevator(hardwareMap, telemetry);
         // Retrieve the IMU from the hardware map
         imu = hardwareMap.get(IMU.class, "imu");
         servo1 = hardwareMap.get(Servo.class, "servo");
@@ -249,7 +247,7 @@ public class FieldCentricTeleop extends OpMode {
             }
 
         }
-        if (!safety_net && !gamepad2.b && !gamepad2.a){
+        if (!safety_net && !gamepad2.b && !gamepad2.a ){
             armotor.setPower(0);
         }
         if (gamepad2.b) {
@@ -273,80 +271,32 @@ public class FieldCentricTeleop extends OpMode {
 
 
         }
-        grabber_current_position = grabberArmElevator.getCurrentPosition();
-        telemetry.addData("Grabber current Position", grabber_current_position);
-        if (gamepad2.y) {
-//            int startPosition;
-//            grabberArmElevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//            grabber_current_position = grabberArmElevator.getCurrentPosition();
-//            telemetry.addData("Current Position:", grabber_current_position);
-//
-//            if (grabber_current_position < grabber_max_position) {
-//                grabberArmElevator.setPower(1);
-//                telemetry.addData("Grabber current position:", grabber_current_position);
-//                telemetry.addData("Power set to: ", 1);
-//                //grabberArmElevator.setTargetPosition(grabber_max_position);
-//                //telemetry.addData("Target Position Set To:", 700 );
-//            } else {
-//                telemetry.addLine("Max Height Reached");
-//                grabberArmElevator.setPower(0);
-//            }
-//            telemetry.addData("Grabber Max Possition",grabber_max_position);
-            linearSlideElevator.ClawUp();
 
+        //Handles manual up and down control for the claw elevator
+        linearSlideElevator.handleTeleop(gamepad2.y, gamepad2.a);
 
-        } else {
-            telemetry.addLine("none");
-
-        }
-        if (gamepad2.a) {
-            int startPosition;
-            grabberArmElevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            grabber_current_position = grabberArmElevator.getCurrentPosition();
-            telemetry.addData("Current Position:", grabber_current_position);
-            if (grabber_current_position > grabber_min_position || !safety_net) {
-                grabberArmElevator.setPower(-1);
-                telemetry.addData("Power set to: ", -1);
-                telemetry.addData("Grabber current position:", grabber_current_position);
-                //grabberArmElevator.setTargetPosition(grabber_min_position);
-                //telemetry.addData("Target Position Set To:", 0);
-            } else {
-                telemetry.addLine("Min Height Reached");
-                grabberArmElevator.setPower(0);
-            }
-
-
-        } else {
-            telemetry.addLine("N/A");
-
-        }
-        if (!gamepad2.y && !gamepad2.a) {
-            grabberArmElevator.setPower(0);
-            telemetry.addLine("no buttons power = 0");
-        }
-        //grabberArmElevator.setPower(0);
         if (gamepad2.right_bumper) {
-            telemetry.addLine("opening claw");
-            servo1.setPosition(0.6);
+            linearSlideElevator.executeAction(linearSlideElevator.clawOpenAction());
         }
         if (gamepad2.left_bumper) {
-            servo1.setPosition(0);
-            telemetry.addLine("closing claw");
+           linearSlideElevator.executeAction(linearSlideElevator.clawCloseAction());
 
         }
         if (DPadUpDebouncer.getDebounced(gamepad2.dpad_up)) {
             if (safety_net) {
                 safety_net = false;
+                linearSlideElevator.safety_net = safety_net;
                 telemetry.addData("Safety Net: ", safety_net);
             } else {
                 safety_net = true;
+                linearSlideElevator.safety_net = safety_net;
                 telemetry.addData("Safety Net: ", safety_net);
             }
         }
 
         //         armotor.setPower(0);
 
-
+        linearSlideElevator.processAction();
         telemetry.update();
     }
 
